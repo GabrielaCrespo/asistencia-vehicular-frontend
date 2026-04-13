@@ -1,0 +1,80 @@
+<!-- TEMPLATE LOGIN TALLER -->
+<div class="login-container">
+  <div class="login-card">
+    <!-- Header -->
+    <div class="login-header">
+      <h1>Acceso Taller</h1>
+      <p class="subtitle">Ingresa tus credenciales para acceder</p>
+    </div>
+
+    <!-- Formulario -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      
+      <!-- Error general -->
+      <div *ngIf="errorMessage" class="alert alert-danger">
+        <strong>Error:</strong> {{ errorMessage }}
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email" class="form-label">Email</label>
+        <input
+          id="email"
+          type="email"
+          class="form-control"
+          formControlName="email"
+          placeholder="taller@example.com"
+          [class.is-invalid]="emailControl?.invalid && emailControl?.touched"
+          [disabled]="isLoading"
+        />
+        <small class="error-text" *ngIf="emailControl?.invalid && emailControl?.touched">
+          {{ emailError }}
+        </small>
+      </div>
+
+      <!-- Contraseña -->
+      <div class="form-group">
+        <label for="password" class="form-label">Contraseña</label>
+        <div class="password-input-group">
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            class="form-control"
+            formControlName="password"
+            placeholder="Ingresa tu contraseña"
+            [class.is-invalid]="passwordControl?.invalid && passwordControl?.touched"
+            [disabled]="isLoading"
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="togglePasswordVisibility()"
+            [disabled]="isLoading"
+          >
+            {{ showPassword ? '🙈' : '👁️' }}
+          </button>
+        </div>
+        <small class="error-text" *ngIf="passwordControl?.invalid && passwordControl?.touched">
+          {{ passwordError }}
+        </small>
+      </div>
+
+      <!-- Botón Submit -->
+      <button
+        type="submit"
+        class="btn btn-primary btn-block"
+        [disabled]="isLoading || loginForm.invalid"
+      >
+        <span *ngIf="!isLoading">Ingresar</span>
+        <span *ngIf="isLoading">Cargando...</span>
+      </button>
+    </form>
+
+    <!-- Footer -->
+    <div class="login-footer">
+      <p>¿No tienes cuenta?
+        <a routerLink="/auth/register" class="link-primary">Regístrate aquí</a>
+      </p>
+    </div>
+  </div>
+</div>

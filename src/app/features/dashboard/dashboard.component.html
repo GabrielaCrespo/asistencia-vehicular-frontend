@@ -1,0 +1,250 @@
+<!-- DASHBOARD — Asistencia Vehicular -->
+<div class="dash-page">
+
+  <!-- ── NAVBAR ── -->
+  <header class="dash-nav">
+    <div class="nav-inner">
+
+      <a class="nav-brand" routerLink="/">
+        <svg viewBox="0 0 48 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 20 L9 11 L15 6 L33 6 L39 11 L42 20 Z" fill="white" opacity="0.92"/>
+          <path d="M16 6 L18 2 L30 2 L32 6 Z" fill="white"/>
+          <rect x="18" y="2.5" width="12" height="4" rx="1.5" fill="rgba(147,197,253,0.5)"/>
+          <circle cx="13" cy="22" r="5" fill="rgba(255,255,255,0.25)" stroke="white" stroke-width="1.8"/>
+          <circle cx="13" cy="22" r="2.2" fill="white" opacity="0.7"/>
+          <circle cx="35" cy="22" r="5" fill="rgba(255,255,255,0.25)" stroke="white" stroke-width="1.8"/>
+          <circle cx="35" cy="22" r="2.2" fill="white" opacity="0.7"/>
+        </svg>
+        <span>Asistencia Vehicular</span>
+      </a>
+
+      <div class="nav-right">
+        <div class="nav-user" *ngIf="currentUser">
+          <div class="user-avatar">{{ currentUser.nombre?.charAt(0)?.toUpperCase() }}</div>
+          <span class="user-name">{{ currentUser.nombre }}</span>
+        </div>
+        <button (click)="logout()" class="btn-logout">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Cerrar sesión
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ── CONTENIDO ── -->
+  <main class="dash-main">
+    <div class="dash-wrap">
+
+      <!-- Bienvenida -->
+      <div class="welcome-banner">
+        <div class="welcome-text">
+          <p class="welcome-label">Panel de gestión</p>
+          <h1>Bienvenido, <span class="welcome-name">{{ currentUser?.nombre || 'Usuario' }}</span></h1>
+          <p class="welcome-taller" *ngIf="currentUser?.razon_social">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            {{ currentUser?.razon_social }}
+          </p>
+        </div>
+        <div class="welcome-badge">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+          </svg>
+          Taller activo
+        </div>
+      </div>
+
+      <!-- Tarjetas de estado -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="--ic:#eff6ff;--cc:#3b82f6">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+          </div>
+          <div>
+            <p class="stat-label">Servicios completados</p>
+            <p class="stat-val">—</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="--ic:#fff7ed;--cc:#f97316">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <div>
+            <p class="stat-label">Solicitudes pendientes</p>
+            <p class="stat-val">—</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="--ic:#f0fdf4;--cc:#22c55e">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          </div>
+          <div>
+            <p class="stat-label">Calificación promedio</p>
+            <p class="stat-val">—</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="--ic:#fdf4ff;--cc:#a855f7">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+              <line x1="1" y1="10" x2="23" y2="10"/>
+            </svg>
+          </div>
+          <div>
+            <p class="stat-label">Ingresos del mes</p>
+            <p class="stat-val">—</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid principal -->
+      <div class="main-grid">
+
+        <!-- Funciones próximas -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Módulos del sistema</h3>
+            <span class="panel-tag">Próximamente</span>
+          </div>
+          <ul class="feature-list">
+            <li class="feature-item">
+              <div class="feat-icon-sm" style="--ic:#eff6ff;--cc:#3b82f6">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.88 13 19.79 19.79 0 0 1 1.85 4.38 2 2 0 0 1 3.83 2.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6"/>
+                </svg>
+              </div>
+              <div>
+                <p class="feat-name">Solicitudes de emergencia</p>
+                <p class="feat-desc">Recibe y gestiona llamadas de auxilio en tiempo real</p>
+              </div>
+            </li>
+            <li class="feature-item">
+              <div class="feat-icon-sm" style="--ic:#fff7ed;--cc:#f97316">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+              </div>
+              <div>
+                <p class="feat-name">Diagnóstico con IA</p>
+                <p class="feat-desc">Análisis inteligente de incidentes por audio e imagen</p>
+              </div>
+            </li>
+            <li class="feature-item">
+              <div class="feat-icon-sm" style="--ic:#f0fdf4;--cc:#22c55e">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+              </div>
+              <div>
+                <p class="feat-name">Gestión de técnicos</p>
+                <p class="feat-desc">Asigna y supervisa a tu equipo de mecánicos</p>
+              </div>
+            </li>
+            <li class="feature-item">
+              <div class="feat-icon-sm" style="--ic:#fefce8;--cc:#eab308">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+                  <line x1="6" y1="20" x2="6" y2="14"/>
+                </svg>
+              </div>
+              <div>
+                <p class="feat-name">Reportes y estadísticas</p>
+                <p class="feat-desc">Visualiza el rendimiento de tu taller</p>
+              </div>
+            </li>
+            <li class="feature-item">
+              <div class="feat-icon-sm" style="--ic:#fdf4ff;--cc:#a855f7">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                  <line x1="1" y1="10" x2="23" y2="10"/>
+                </svg>
+              </div>
+              <div>
+                <p class="feat-name">Historial de servicios</p>
+                <p class="feat-desc">Registro completo de todas las atenciones</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Info de la cuenta -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Mi cuenta</h3>
+          </div>
+          <div class="account-info" *ngIf="currentUser">
+            <div class="info-row">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                <polyline points="22,6 12,13 2,6"/>
+              </svg>
+              <div>
+                <p class="info-label">Correo electrónico</p>
+                <p class="info-val">{{ currentUser.email }}</p>
+              </div>
+            </div>
+            <div class="info-row">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              <div>
+                <p class="info-label">Rol</p>
+                <p class="info-val">Taller Mecánico</p>
+              </div>
+            </div>
+            <div class="info-row" *ngIf="currentUser.taller_id">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+              </svg>
+              <div>
+                <p class="info-label">ID Taller</p>
+                <p class="info-val">#{{ currentUser.taller_id }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Estado del sistema -->
+          <div class="system-status">
+            <div class="status-header">Estado del sistema</div>
+            <div class="status-row">
+              <span class="status-dot green"></span>
+              <span>API Backend</span>
+              <span class="status-pill ok">Activo</span>
+            </div>
+            <div class="status-row">
+              <span class="status-dot green"></span>
+              <span>Autenticación JWT</span>
+              <span class="status-pill ok">Activo</span>
+            </div>
+            <div class="status-row">
+              <span class="status-dot yellow"></span>
+              <span>Módulo IA</span>
+              <span class="status-pill warn">En desarrollo</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+</div>
