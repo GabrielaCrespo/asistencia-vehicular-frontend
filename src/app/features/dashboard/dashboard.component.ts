@@ -1,8 +1,5 @@
 /**
- * DASHBOARD - PLACEHOLDER
- * 
- * Componente básico que se renderiza después del login.
- * Será expandido con funcionalidades posteriores.
+ * DASHBOARD - Centro de Control del Taller
  */
 
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
@@ -14,6 +11,13 @@ import { takeUntil } from 'rxjs/operators';
 import { AuthService } from '../../core/auth/auth.service';
 import { CurrentUser } from '../../core/models/auth.models';
 import { environment } from '../../environments/environment';
+
+interface NavItem {
+  label: string;
+  url: string;
+  icon: string;
+  description: string;
+}
 
 @Component({
   selector: 'app-dashboard',
@@ -28,18 +32,31 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   currentUser: CurrentUser | null = null;
+  showMobileMenu = false;
+
+  navItems: NavItem[] = [
+    { label: 'Técnicos',  url: '/tecnicos', icon: '👨‍🔧', description: 'Gestiona los técnicos de tu taller' },
+    { label: 'Servicios', url: '/servicios', icon: '🔧',    description: 'Configura servicios ofrecidos' }
+  ];
 
   ngOnInit(): void {
     this.authService.currentUser$()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(user => {
-        this.currentUser = user;
-      });
+      .subscribe(user => { this.currentUser = user; });
   }
 
   logout(): void {
-    this.authService.logout();
-    this.router.navigate([environment.auth.routes.login]);
+    if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+      this.authService.logout();
+      this.router.navigate([environment.auth.routes.login]);
+    }
+  }
+
+  toggleMobileMenu(): void { this.showMobileMenu = !this.showMobileMenu; }
+
+  navigate(url: string): void {
+    this.showMobileMenu = false;
+    this.router.navigate([url]);
   }
 
   ngOnDestroy(): void {

@@ -44,11 +44,16 @@ export interface UserResponse {
   usuario_id: number;
   nombre: string;
   email: string;
+  telefono?: string;
   documento_identidad: string;
   estado: string;
   rol_id: number;
   taller_id: number;
   razon_social: string;
+  direccion?: string;
+  telefono_operativo?: string;
+  horario_inicio?: string;
+  horario_fin?: string;
 }
 
 /**
@@ -118,9 +123,53 @@ export interface CurrentUser {
   usuario_id: number;
   nombre: string;
   email: string;
+  telefono?: string;
+  documento_identidad?: string;
   taller_id: number;
   razon_social: string;
   rol_id: number;
+  direccion?: string;
+  telefono_operativo?: string;
+  horario_inicio?: string;
+  horario_fin?: string;
+}
+
+/**
+ * Perfil completo del taller (retornado por GET /api/taller/profile/{id})
+ */
+export interface TallerProfile {
+  usuario_id: number;
+  nombre: string;
+  email: string;
+  telefono?: string;
+  documento_identidad?: string;
+  rol_id: number;
+  estado: string;
+  taller_id: number;
+  razon_social: string;
+  direccion?: string;
+  latitud?: number;
+  longitud?: number;
+  telefono_operativo?: string;
+  horario_inicio?: string;
+  horario_fin?: string;
+  disponible: boolean;
+  calificacion_promedio: number;
+}
+
+/**
+ * Campos editables del perfil (enviado a PUT /api/taller/profile/{id})
+ */
+export interface TallerProfileUpdate {
+  nombre_contacto?: string;
+  telefono?: string;
+  razon_social?: string;
+  direccion?: string;
+  latitud?: number;
+  longitud?: number;
+  telefono_operativo?: string;
+  horario_inicio?: string;
+  horario_fin?: string;
 }
 
 // ==================== ENUMS ====================
