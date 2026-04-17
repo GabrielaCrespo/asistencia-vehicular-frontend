@@ -206,6 +206,7 @@
             </div>
           </div>
 
+          <!-- Dirección con búsqueda Nominatim -->
           <div class="field-group">
             <label for="direccion" class="field-label">Dirección del taller</label>
             <div class="input-wrapper" [class.has-error]="direccionControl?.invalid && direccionControl?.touched">
@@ -213,10 +214,38 @@
                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
                 <circle cx="12" cy="10" r="3"/>
               </svg>
-              <input id="direccion" type="text" formControlName="direccion"
-                     placeholder="Av. Principal 123, Santa Cruz" class="field-input"/>
+              <input
+                id="direccion"
+                type="text"
+                [value]="registerForm.get('direccion')?.value"
+                (input)="onDireccionInput($event)"
+                (blur)="hideSuggestions()"
+                placeholder="Escribe la dirección o haz clic en el mapa"
+                class="field-input"
+                autocomplete="off"
+              />
+              <span *ngIf="searchLoading" class="search-spinner"></span>
             </div>
-            <span *ngIf="direccionControl?.invalid && direccionControl?.touched" class="field-error">La dirección es requerida</span>
+
+            <!-- Sugerencias Nominatim -->
+            <div *ngIf="showSuggestions && searchResults.length > 0" class="suggestions-list">
+              <button
+                type="button"
+                class="suggestion-item"
+                *ngFor="let r of searchResults"
+                (mousedown)="selectSuggestion(r)"
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                  <circle cx="12" cy="10" r="3"/>
+                </svg>
+                {{ r.display_name }}
+              </button>
+            </div>
+
+            <span *ngIf="direccionControl?.invalid && direccionControl?.touched" class="field-error">
+              La dirección es requerida
+            </span>
           </div>
 
           <div class="field-group">
@@ -257,34 +286,30 @@
             </div>
           </div>
 
-          <div class="two-col">
-            <div class="field-group">
-              <label for="latitud" class="field-label">Latitud</label>
-              <div class="input-wrapper" [class.has-error]="latitudControl?.invalid && latitudControl?.touched">
-                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <line x1="2" y1="12" x2="22" y2="12"/>
-                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                </svg>
-                <input id="latitud" type="number" formControlName="latitud"
-                       placeholder="-17.7863" step="0.0001" class="field-input"/>
-              </div>
-              <span *ngIf="latitudControl?.invalid && latitudControl?.touched" class="field-error">Requerido</span>
+          <!-- Selector de ubicación con Leaflet + OpenStreetMap -->
+          <div class="field-group">
+            <label class="field-label">
+              Ubicación en el mapa
+              <span class="field-label-hint">Haz clic en el mapa o busca la dirección arriba</span>
+            </label>
+
+            <div
+              #mapContainer
+              class="map-container"
+              [class.map-error]="latitudControl?.invalid && latitudControl?.touched"
+            ></div>
+
+            <div *ngIf="selectedLat !== null" class="coords-display">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              {{ selectedLat }}, {{ selectedLng }}
             </div>
 
-            <div class="field-group">
-              <label for="longitud" class="field-label">Longitud</label>
-              <div class="input-wrapper" [class.has-error]="longitudControl?.invalid && longitudControl?.touched">
-                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <line x1="2" y1="12" x2="22" y2="12"/>
-                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                </svg>
-                <input id="longitud" type="number" formControlName="longitud"
-                       placeholder="-63.1812" step="0.0001" class="field-input"/>
-              </div>
-              <span *ngIf="longitudControl?.invalid && longitudControl?.touched" class="field-error">Requerido</span>
-            </div>
+            <span *ngIf="latitudControl?.invalid && latitudControl?.touched" class="field-error">
+              Selecciona la ubicación en el mapa
+            </span>
           </div>
 
           <div class="btn-row">

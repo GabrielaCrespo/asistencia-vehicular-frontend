@@ -9,6 +9,8 @@ import { Routes } from '@angular/router';
 import { WelcomeComponent } from './features/welcome/welcome.component';
 import { AUTH_ROUTES } from './features/auth/auth.routes';
 import { authGuard } from './core/guards/auth.guard';
+import { tecnicosRoutes } from './features/tecnicos/tecnicos.routes';
+import { serviciosRoutes } from './features/servicios/servicios.routes';
 
 export const routes: Routes = [
   // LANDING PAGE / BIENVENIDA
@@ -21,12 +23,36 @@ export const routes: Routes = [
   // Rutas de autenticación
   ...AUTH_ROUTES,
 
-  // Ruta protegida: Dashboard (será implementado después)
+  // Ruta protegida: Dashboard
   {
     path: 'dashboard',
     canActivate: [authGuard],
     loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
     data: { title: 'Dashboard - Taller' }
+  },
+
+  // Ruta protegida: Técnicos
+  {
+    path: 'tecnicos',
+    canActivate: [authGuard],
+    children: tecnicosRoutes,
+    data: { title: 'Técnicos' }
+  },
+
+  // Ruta protegida: Servicios
+  {
+    path: 'servicios',
+    canActivate: [authGuard],
+    children: serviciosRoutes,
+    data: { title: 'Servicios' }
+  },
+
+  // Ruta protegida: Perfil del Taller
+  {
+    path: 'perfil',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/perfil/perfil.component').then(m => m.PerfilComponent),
+    data: { title: 'Perfil del Taller' }
   },
 
   // Ruta comodín para página no encontrada

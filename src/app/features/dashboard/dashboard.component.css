@@ -494,6 +494,86 @@ html.dark-theme .status-pill.warn {
   border-color: rgba(234,179,8,0.2);
 }
 
+/* ── NAV GRID — Tarjetas de Módulos ── */
+.nav-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.2rem;
+}
+
+.nav-card {
+  position: relative;
+  background: linear-gradient(135deg, #5cbdb9 0%, #3aa7a2 100%);
+  border-radius: 16px;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+}
+
+.nav-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(58, 167, 162, 0.3);
+}
+
+.nav-card:active {
+  transform: translateY(-2px);
+}
+
+.nav-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(20px); }
+}
+
+.nav-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  z-index: 1;
+}
+
+.nav-card h4 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+  z-index: 1;
+}
+
+.nav-card p {
+  font-size: 0.9rem;
+  margin: 0;
+  opacity: 0.95;
+  flex-grow: 1;
+  z-index: 1;
+}
+
+.nav-arrow {
+  font-size: 1.5rem;
+  margin-top: 1rem;
+  opacity: 0.8;
+  transition: transform 0.3s ease;
+  z-index: 1;
+}
+
+.nav-card:hover .nav-arrow {
+  transform: translateX(4px);
+}
+
 /* ── RESPONSIVE ── */
 @media (max-width: 1024px) {
   .stats-grid { grid-template-columns: repeat(2, 1fr); }

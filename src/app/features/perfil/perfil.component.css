@@ -1,0 +1,340 @@
+/* ═══════════════════════════════════════════
+   PERFIL DEL TALLER
+   ═══════════════════════════════════════════ */
+
+.perfil-page {
+  min-height: 100vh;
+  background: #f1f5f9;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── NAVBAR (reutiliza estilos del dashboard) ── */
+.dash-nav {
+  background: linear-gradient(135deg, #5cbdb9 0%, #3aa7a2 100%);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 20px rgba(58,167,162,0.3);
+}
+
+.nav-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.nav-brand svg { width: 40px; height: auto; }
+
+.nav-right { display: flex; align-items: center; gap: 0.75rem; }
+
+.btn-back, .btn-logout {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: none;
+  border-radius: 8px;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+
+.btn-back {
+  background: rgba(255,255,255,0.2);
+  color: white;
+}
+.btn-back:hover { background: rgba(255,255,255,0.32); }
+
+.btn-logout {
+  background: rgba(255,255,255,0.12);
+  color: white;
+}
+.btn-logout:hover { background: rgba(255,80,80,0.35); }
+
+/* ── CONTENIDO ── */
+.perfil-main {
+  flex: 1;
+  padding: 2.5rem 1.5rem;
+}
+
+.perfil-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* ── CARGA / ERROR ── */
+.loading-state {
+  text-align: center;
+  padding: 4rem;
+  color: #64748b;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #5cbdb9;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin: 0 auto 1rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.2rem;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+.alert-success { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+.alert-error   { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
+/* ── CABECERA ── */
+.profile-header {
+  background: white;
+  border-radius: 16px;
+  padding: 1.8rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.profile-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #5cbdb9, #3aa7a2);
+  color: white;
+  font-size: 1.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.profile-headline { flex: 1; }
+.profile-headline h1 { margin: 0 0 0.25rem; font-size: 1.3rem; color: #0f172a; }
+.profile-sub { margin: 0; color: #64748b; font-size: 0.85rem; }
+
+.btn-edit {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1.2rem;
+  border-radius: 10px;
+  border: 1.5px solid #5cbdb9;
+  background: transparent;
+  color: #3aa7a2;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+.btn-edit:hover, .btn-edit.active {
+  background: #5cbdb9;
+  color: white;
+}
+
+/* ── GRID DE TARJETAS (modo lectura) ── */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.info-card {
+  background: white;
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 1.1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid #f8fafc;
+}
+.card-row:last-child { border-bottom: none; }
+
+.row-label {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.row-val {
+  color: #0f172a;
+  font-size: 0.87rem;
+  font-weight: 500;
+  text-align: right;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.badge-green { background: #f0fdf4; color: #16a34a; }
+.badge-red   { background: #fef2f2; color: #dc2626; }
+
+/* ── FORMULARIO DE EDICIÓN ── */
+.edit-form {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.form-section { display: flex; flex-direction: column; gap: 1rem; }
+
+.section-title {
+  margin: 0 0 0.25rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding-bottom: 0.6rem;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.field label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.field input {
+  padding: 0.6rem 0.9rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 9px;
+  font-size: 0.88rem;
+  color: #0f172a;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  background: #fafafa;
+}
+.field input:focus {
+  outline: none;
+  border-color: #5cbdb9;
+  box-shadow: 0 0 0 3px rgba(92,189,185,0.15);
+  background: white;
+}
+.field input.invalid {
+  border-color: #f87171;
+}
+
+.field-error {
+  color: #ef4444;
+  font-size: 0.74rem;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.btn-primary, .btn-secondary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.5rem;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.18s;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #5cbdb9, #3aa7a2);
+  color: white;
+}
+.btn-primary:hover:not(:disabled) { opacity: 0.9; }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.btn-secondary {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1.5px solid #e2e8f0;
+}
+.btn-secondary:hover { background: #e2e8f0; }
+
+.btn-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@media (max-width: 640px) {
+  .perfil-main { padding: 1.5rem 1rem; }
+  .profile-header { flex-wrap: wrap; }
+  .btn-edit { width: 100%; justify-content: center; }
+}

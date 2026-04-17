@@ -115,9 +115,15 @@ export class AuthService {
           usuario_id: user.usuario_id,
           nombre: user.nombre,
           email: user.email,
+          telefono: user.telefono,
+          documento_identidad: user.documento_identidad,
           taller_id: user.taller_id || 0,
           razon_social: user.razon_social || '',
           rol_id: user.rol_id,
+          direccion: user.direccion,
+          telefono_operativo: user.telefono_operativo,
+          horario_inicio: user.horario_inicio,
+          horario_fin: user.horario_fin,
         };
 
         // Guardar en storage
@@ -193,6 +199,18 @@ export class AuthService {
    */
   getToken(): string | null {
     return this.authState.value.token;
+  }
+
+  /**
+   * Actualiza campos del usuario actual en estado y localStorage.
+   * Llamar después de editar el perfil para evitar re-login.
+   */
+  updateCurrentUserFields(updates: Partial<CurrentUser>): void {
+    const current = this.authState.value;
+    if (!current.currentUser) return;
+    const updated: CurrentUser = { ...current.currentUser, ...updates };
+    this.storageService.setCurrentUser(updated);
+    this.authState.next({ ...current, currentUser: updated });
   }
 
   /**
