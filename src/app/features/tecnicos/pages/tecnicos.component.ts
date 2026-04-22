@@ -124,6 +124,23 @@ export class TecnicosComponent implements OnInit, OnDestroy {
     }
   }
 
+  toggleDisponible(tecnico: Tecnico) {
+    if (!this.currentUser) return;
+    this.tecnicosService.actualizarTecnico(
+      this.currentUser.taller_id,
+      tecnico.tecnico_id,
+      { disponible: !tecnico.disponible }
+    ).pipe(takeUntil(this.destroy$)).subscribe({
+      error: (err) => console.error('Error actualizando disponibilidad:', err)
+    });
+  }
+
+  abrirUbicacion(tecnico: Tecnico) {
+    if (tecnico.latitud_actual != null && tecnico.longitud_actual != null) {
+      window.open(`https://www.google.com/maps?q=${tecnico.latitud_actual},${tecnico.longitud_actual}`, '_blank');
+    }
+  }
+
   eliminarTecnico(tecnico: Tecnico) {
     if (!this.currentUser) return;
     if (confirm(`¿Eliminar técnico "${tecnico.nombre}"?`)) {

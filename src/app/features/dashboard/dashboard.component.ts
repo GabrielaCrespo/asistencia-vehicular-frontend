@@ -35,8 +35,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   showMobileMenu = false;
 
   navItems: NavItem[] = [
-    { label: 'Técnicos',  url: '/tecnicos', icon: '👨‍🔧', description: 'Gestiona los técnicos de tu taller' },
-    { label: 'Servicios', url: '/servicios', icon: '🔧',    description: 'Configura servicios ofrecidos' }
+    { label: 'Solicitudes', url: '/solicitudes', icon: '📋', description: 'Ver y gestionar solicitudes de clientes' },
+    { label: 'Técnicos',   url: '/tecnicos',    icon: '👨‍🔧', description: 'Gestiona los técnicos de tu taller' },
+    { label: 'Servicios',  url: '/servicios',   icon: '🔧',  description: 'Configura servicios ofrecidos' },
   ];
 
   ngOnInit(): void {

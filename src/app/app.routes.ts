@@ -11,6 +11,7 @@ import { AUTH_ROUTES } from './features/auth/auth.routes';
 import { authGuard } from './core/guards/auth.guard';
 import { tecnicosRoutes } from './features/tecnicos/tecnicos.routes';
 import { serviciosRoutes } from './features/servicios/servicios.routes';
+import { solicitudesRoutes } from './features/solicitudes/solicitudes.routes';
 
 export const routes: Routes = [
   // LANDING PAGE / BIENVENIDA
@@ -45,6 +46,14 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: serviciosRoutes,
     data: { title: 'Servicios' }
+  },
+
+  // Ruta protegida: Solicitudes
+  {
+    path: 'solicitudes',
+    canActivate: [authGuard],
+    children: solicitudesRoutes,
+    data: { title: 'Solicitudes' }
   },
 
   // Ruta protegida: Perfil del Taller

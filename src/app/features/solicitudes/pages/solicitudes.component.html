@@ -1,0 +1,710 @@
+<div class="page">
+
+  <!-- ── HEADER ── -->
+  <header class="page-header">
+    <div class="header-inner">
+      <div class="header-left">
+        <a routerLink="/dashboard" class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+          Dashboard
+        </a>
+        <div class="header-title">
+          <div class="header-icon-wrap">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+              <rect x="9" y="3" width="6" height="4" rx="1"/>
+              <path d="M9 12h6M9 16h4"/>
+            </svg>
+          </div>
+          <div>
+            <h1>Solicitudes</h1>
+            <p class="header-subtitle">Gestión de incidentes y asignaciones</p>
+          </div>
+        </div>
+      </div>
+      <button class="btn-refresh" (click)="setTab(activeTab)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <polyline points="23 4 23 10 17 10"/>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+        </svg>
+        Actualizar
+      </button>
+    </div>
+  </header>
+
+  <!-- ── BODY ── -->
+  <main class="page-body">
+    <div class="body-wrap">
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab-btn" [class.active]="activeTab === 'disponibles'" (click)="setTab('disponibles')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          Disponibles
+        </button>
+        <button class="tab-btn" [class.active]="activeTab === 'asignadas'" (click)="setTab('asignadas')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+          </svg>
+          Asignadas
+        </button>
+        <button class="tab-btn" [class.active]="activeTab === 'historial'" (click)="setTab('historial')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="12 8 12 12 14 14"/><circle cx="12" cy="12" r="10"/>
+          </svg>
+          Historial
+        </button>
+      </div>
+
+      <!-- Loading / Error -->
+      <div *ngIf="loading$ | async" class="alert alert-info">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+        Cargando...
+      </div>
+      <div *ngIf="error$ | async as error" class="alert alert-error">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+        </svg>
+        {{ error }}
+      </div>
+
+      <!-- ── TAB: DISPONIBLES ── -->
+      <ng-container *ngIf="activeTab === 'disponibles'">
+        <ng-container *ngIf="disponibles$ | async as lista">
+          <div class="panel-header-row">
+            <h3>Solicitudes disponibles</h3>
+            <span class="panel-tag">{{ lista.length }} pendiente{{ lista.length !== 1 ? 's' : '' }}</span>
+          </div>
+
+          <div *ngIf="lista.length > 0; else sinDisponibles" class="cards-grid">
+            <div class="solicitud-card" *ngFor="let s of lista" [class.urgente]="s.prioridad === 'urgente'">
+              <div class="card-top">
+                <div class="card-vehicle">
+                  <div class="vehicle-avatar">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/>
+                      <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="vehicle-name">{{ s.marca }} {{ s.modelo }}</p>
+                    <p class="vehicle-plate">{{ s.placa }}</p>
+                  </div>
+                </div>
+                <div class="card-badges">
+                  <span class="badge" [ngClass]="prioridadClass(s.prioridad)">
+                    {{ s.prioridad === 'urgente' ? '⚡ Urgente' : 'Normal' }}
+                  </span>
+                </div>
+              </div>
+
+              <p class="card-desc">{{ s.descripcion }}</p>
+
+              <div class="card-meta">
+                <div class="meta-item">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                  </svg>
+                  {{ s.cliente_nombre }}
+                </div>
+                <div class="meta-item">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                  </svg>
+                  {{ s.cliente_telefono }}
+                </div>
+                <div class="meta-item">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="12 8 12 12 14 14"/><circle cx="12" cy="12" r="10"/>
+                  </svg>
+                  {{ s.fecha_creacion | date:'dd/MM/yyyy HH:mm' }}
+                </div>
+              </div>
+
+              <div class="card-evidencias">
+                <span *ngIf="s.imagen_path" class="ev-badge">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
+                  </svg>
+                  Imagen
+                </span>
+                <span *ngIf="s.audio_path" class="ev-badge">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/>
+                  </svg>
+                  Audio
+                </span>
+              </div>
+
+              <div class="card-actions">
+                <button class="btn-detail" (click)="abrirDetalle(s.incidente_id)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                  </svg>
+                  Ver detalle
+                </button>
+                <button class="btn-reject" (click)="abrirRechazar(s.incidente_id)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+                  </svg>
+                  Rechazar
+                </button>
+                <button class="btn-accept" (click)="aceptar(s)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                  </svg>
+                  Aceptar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #sinDisponibles>
+            <div class="empty-state">
+              <div class="empty-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                </svg>
+              </div>
+              <p class="empty-title">Sin solicitudes disponibles</p>
+              <p class="empty-desc">No hay incidentes pendientes en este momento</p>
+            </div>
+          </ng-template>
+        </ng-container>
+      </ng-container>
+
+      <!-- ── TAB: ASIGNADAS ── -->
+      <ng-container *ngIf="activeTab === 'asignadas'">
+        <ng-container *ngIf="asignadas$ | async as lista">
+          <div class="panel-header-row">
+            <h3>Solicitudes asignadas</h3>
+            <span class="panel-tag">{{ lista.length }} activa{{ lista.length !== 1 ? 's' : '' }}</span>
+          </div>
+          <div class="panel" *ngIf="lista.length > 0; else sinAsignadas">
+            <div class="table-wrap">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Cliente / Vehículo</th>
+                    <th>Descripción</th>
+                    <th>Técnico</th>
+                    <th>Prioridad</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let a of lista">
+                    <td>
+                      <div class="cell-stacked">
+                        <span class="cell-main">{{ a.cliente_nombre }}</span>
+                        <span class="cell-sub">{{ a.marca }} {{ a.modelo }} · {{ a.placa }}</span>
+                      </div>
+                    </td>
+                    <td class="desc-cell">{{ a.descripcion }}</td>
+                    <td>
+                      <span *ngIf="a.tecnico_nombre" class="tecnico-chip">{{ a.tecnico_nombre }}</span>
+                      <span *ngIf="!a.tecnico_nombre" class="text-secondary text-sm">Sin asignar</span>
+                    </td>
+                    <td>
+                      <span class="badge" [ngClass]="prioridadClass(a.prioridad)">{{ a.prioridad }}</span>
+                    </td>
+                    <td>
+                      <span class="badge" [ngClass]="estadoBadgeClass(a.estado)">{{ a.estado }}</span>
+                    </td>
+                    <td>
+                      <div class="actions actions-wrap">
+                        <!-- Ver detalle -->
+                        <button class="action-btn" (click)="abrirDetalle(a.incidente_id)" title="Ver detalle">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                          </svg>
+                        </button>
+                        <!-- Ubicación -->
+                        <button class="action-btn map-btn" (click)="abrirMapa(a.latitud, a.longitud)" title="Ver ubicación">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                          </svg>
+                        </button>
+                        <!-- Asignar técnico -->
+                        <button class="action-btn tecnico-btn" (click)="abrirAsignarTecnico(a)" title="Asignar técnico">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/>
+                          </svg>
+                        </button>
+                        <!-- Avanzar estado -->
+                        <button
+                          *ngIf="siguienteEstado(a.estado) as next"
+                          class="action-btn estado-btn"
+                          (click)="actualizarEstado(a, next)"
+                          [title]="'Marcar: ' + etiquetaEstado(next)">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 11 12 14 22 4"/>
+                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                          </svg>
+                          {{ etiquetaEstado(next) }}
+                        </button>
+                        <!-- Diagnóstico -->
+                        <button class="action-btn diag-btn" (click)="abrirDiagnostico(a)" title="Diagnóstico y costo">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+                            <polyline points="10 9 9 9 8 9"/>
+                          </svg>
+                          Diagnóstico
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <ng-template #sinAsignadas>
+            <div class="empty-state">
+              <div class="empty-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+                  <rect x="9" y="3" width="6" height="4" rx="1"/>
+                </svg>
+              </div>
+              <p class="empty-title">Sin solicitudes asignadas</p>
+              <p class="empty-desc">No tienes incidentes activos en este momento</p>
+            </div>
+          </ng-template>
+        </ng-container>
+      </ng-container>
+
+      <!-- ── TAB: HISTORIAL ── -->
+      <ng-container *ngIf="activeTab === 'historial'">
+        <ng-container *ngIf="historial$ | async as lista">
+          <div class="panel-header-row">
+            <h3>Historial de solicitudes</h3>
+            <span class="panel-tag">{{ lista.length }} registro{{ lista.length !== 1 ? 's' : '' }}</span>
+          </div>
+          <div class="panel" *ngIf="lista.length > 0; else sinHistorial">
+            <div class="table-wrap">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Cliente / Vehículo</th>
+                    <th>Descripción</th>
+                    <th>Prioridad</th>
+                    <th>Estado</th>
+                    <th>Obs.</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let a of lista">
+                    <td class="text-secondary">{{ a.asignacion_id }}</td>
+                    <td>
+                      <div class="cell-stacked">
+                        <span class="cell-main">{{ a.cliente_nombre }}</span>
+                        <span class="cell-sub">{{ a.marca }} {{ a.modelo }} · {{ a.placa }}</span>
+                      </div>
+                    </td>
+                    <td class="desc-cell">{{ a.descripcion }}</td>
+                    <td>
+                      <span class="badge" [ngClass]="prioridadClass(a.prioridad)">{{ a.prioridad }}</span>
+                    </td>
+                    <td>
+                      <span class="badge" [ngClass]="estadoBadgeClass(a.estado)">{{ a.estado }}</span>
+                    </td>
+                    <td class="text-secondary text-sm">{{ a.observaciones || '—' }}</td>
+                    <td class="text-secondary text-sm">{{ a.fecha_asignacion | date:'dd/MM/yy HH:mm' }}</td>
+                    <td>
+                      <button class="action-btn" (click)="abrirDetalle(a.incidente_id)" title="Ver detalle">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <ng-template #sinHistorial>
+            <div class="empty-state">
+              <div class="empty-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <polyline points="12 8 12 12 14 14"/><circle cx="12" cy="12" r="10"/>
+                </svg>
+              </div>
+              <p class="empty-title">Sin historial</p>
+              <p class="empty-desc">Aún no tienes solicitudes registradas</p>
+            </div>
+          </ng-template>
+        </ng-container>
+      </ng-container>
+
+    </div>
+  </main>
+
+</div>
+
+<!-- ══════════ MODAL DETALLE INCIDENTE ══════════ -->
+<div *ngIf="showDetalle" class="modal-overlay" (click)="cerrarDetalle()">
+  <div class="modal modal-lg" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">
+        <div class="modal-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </div>
+        <h2>Detalle del Incidente</h2>
+      </div>
+      <button class="close-btn" (click)="cerrarDetalle()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Loading -->
+      <div *ngIf="loadingDetalle" class="detalle-loading">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="spin">
+          <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+        </svg>
+        Cargando información...
+      </div>
+
+      <ng-container *ngIf="!loadingDetalle && detalle">
+
+        <!-- ── CABECERA: estado + prioridad ── -->
+        <div class="detalle-badges">
+          <span class="badge badge-lg" [ngClass]="estadoBadgeClass(detalle.estado)">{{ detalle.estado }}</span>
+          <span class="badge badge-lg" [ngClass]="prioridadClass(detalle.prioridad)">
+            {{ detalle.prioridad === 'urgente' ? '⚡ Urgente' : 'Normal' }}
+          </span>
+          <span *ngIf="detalle.tipo_problema" class="badge badge-lg badge-tipo">{{ detalle.tipo_problema }}</span>
+          <span class="text-secondary text-sm ml-auto">{{ detalle.fecha_creacion | date:'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+
+        <!-- ── CLIENTE + VEHÍCULO ── -->
+        <div class="detalle-grid">
+          <div class="detalle-section">
+            <div class="section-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+              </svg>
+              Cliente
+            </div>
+            <div class="section-row"><span>Nombre</span><strong>{{ detalle.cliente_nombre }}</strong></div>
+            <div class="section-row"><span>Teléfono</span><strong>{{ detalle.cliente_telefono }}</strong></div>
+            <div class="section-row"><span>Email</span><strong>{{ detalle.cliente_email }}</strong></div>
+          </div>
+          <div class="detalle-section">
+            <div class="section-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/>
+                <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+              </svg>
+              Vehículo
+            </div>
+            <div class="section-row"><span>Marca/Modelo</span><strong>{{ detalle.marca }} {{ detalle.modelo }}</strong></div>
+            <div class="section-row"><span>Placa</span><strong>{{ detalle.placa }}</strong></div>
+            <div class="section-row" *ngIf="detalle.anio"><span>Año</span><strong>{{ detalle.anio }}</strong></div>
+            <div class="section-row" *ngIf="detalle.vehiculo_tipo"><span>Tipo</span><strong>{{ detalle.vehiculo_tipo }}</strong></div>
+          </div>
+        </div>
+
+        <!-- ── 1. DESCRIPCIÓN (texto del cliente) ── -->
+        <div class="detalle-section full">
+          <div class="section-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/>
+              <line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/>
+            </svg>
+            Descripción del cliente
+          </div>
+          <p class="descripcion-text">{{ detalle.descripcion }}</p>
+        </div>
+
+        <!-- ── 2. IMÁGENES ── -->
+        <div class="detalle-section full">
+          <div class="section-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+            Imágenes
+          </div>
+          <ng-container *ngIf="detalle.imagen_path; else sinImagen">
+            <div class="media-preview">
+              <img [src]="imagenUrl(detalle.imagen_path!)" alt="Evidencia fotográfica"
+                   class="preview-img"
+                   (error)="onImgError($event)" />
+              <code class="ev-path">{{ detalle.imagen_path }}</code>
+            </div>
+          </ng-container>
+          <ng-template #sinImagen>
+            <p class="sin-evidencia">El cliente no adjuntó imágenes</p>
+          </ng-template>
+        </div>
+
+        <!-- ── 3. AUDIO TRANSCRITO ── -->
+        <div class="detalle-section full">
+          <div class="section-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/>
+            </svg>
+            Audio
+          </div>
+          <ng-container *ngIf="detalle.audio_path || detalle.ia_analisis?.transcripcion_audio; else sinAudio">
+            <div *ngIf="detalle.audio_path" class="audio-file">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+              </svg>
+              <code class="ev-path">{{ detalle.audio_path }}</code>
+            </div>
+            <div *ngIf="detalle.ia_analisis?.transcripcion_audio" class="transcripcion-box">
+              <div class="transcripcion-label">Transcripción automática</div>
+              <p class="transcripcion-text">{{ detalle.ia_analisis!.transcripcion_audio }}</p>
+            </div>
+          </ng-container>
+          <ng-template #sinAudio>
+            <p class="sin-evidencia">El cliente no adjuntó audio</p>
+          </ng-template>
+        </div>
+
+        <!-- ── 4. CLASIFICACIÓN IA ── -->
+        <div class="detalle-section full">
+          <div class="section-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            Análisis de IA
+          </div>
+          <ng-container *ngIf="detalle.ia_analisis; else sinIA">
+            <div class="ia-grid">
+              <div *ngIf="detalle.ia_analisis.clasificacion" class="ia-item">
+                <div class="ia-item-label">Clasificación</div>
+                <div class="ia-item-val">{{ detalle.ia_analisis.clasificacion }}</div>
+              </div>
+              <div *ngIf="detalle.ia_analisis.nivel_confianza !== null" class="ia-item">
+                <div class="ia-item-label">Confianza</div>
+                <div class="ia-item-val">
+                  <div class="confianza-bar-wrap">
+                    <div class="confianza-bar" [style.width.%]="(detalle.ia_analisis.nivel_confianza! * 100)"></div>
+                  </div>
+                  {{ (detalle.ia_analisis.nivel_confianza! * 100) | number:'1.0-0' }}%
+                </div>
+              </div>
+              <div *ngIf="detalle.ia_analisis.resultado_imagen" class="ia-item">
+                <div class="ia-item-label">Resultado imagen</div>
+                <div class="ia-item-val">{{ detalle.ia_analisis.resultado_imagen }}</div>
+              </div>
+              <div *ngIf="detalle.ia_analisis.tipo_entrada" class="ia-item">
+                <div class="ia-item-label">Tipo entrada</div>
+                <div class="ia-item-val">{{ detalle.ia_analisis.tipo_entrada }}</div>
+              </div>
+            </div>
+            <div *ngIf="detalle.ia_analisis.resumen_automatico" class="ia-resumen">
+              <div class="ia-item-label">Resumen automático</div>
+              <p class="ia-resumen-text">{{ detalle.ia_analisis.resumen_automatico }}</p>
+            </div>
+            <div *ngIf="detalle.ia_analisis.recomendaciones" class="ia-resumen">
+              <div class="ia-item-label">Recomendaciones</div>
+              <p class="ia-resumen-text">{{ detalle.ia_analisis.recomendaciones }}</p>
+            </div>
+          </ng-container>
+          <ng-template #sinIA>
+            <p class="sin-evidencia">Sin análisis de IA para este incidente</p>
+          </ng-template>
+        </div>
+
+        <!-- ── 5. UBICACIÓN ── -->
+        <div class="detalle-section full">
+          <div class="section-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+            </svg>
+            Ubicación del cliente
+          </div>
+          <div class="ubicacion-row">
+            <div class="coords">
+              <span class="coord-label">Lat:</span><code>{{ detalle.latitud }}</code>
+              <span class="coord-label ml">Lng:</span><code>{{ detalle.longitud }}</code>
+            </div>
+            <button class="btn-mapa" (click)="abrirMapa(detalle.latitud, detalle.longitud)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+              </svg>
+              Abrir en Google Maps
+            </button>
+          </div>
+        </div>
+
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MODAL RECHAZAR ══════════ -->
+<div *ngIf="showRechazar" class="modal-overlay" (click)="cerrarRechazar()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">
+        <div class="modal-icon modal-icon-red">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+          </svg>
+        </div>
+        <h2>Rechazar solicitud</h2>
+      </div>
+      <button class="close-btn" (click)="cerrarRechazar()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-desc">Puedes dejar una observación opcional antes de rechazar.</p>
+      <div class="form-group">
+        <label>Observaciones (opcional)</label>
+        <textarea
+          class="form-control"
+          rows="3"
+          [(ngModel)]="rechazarObservaciones"
+          placeholder="Ej: No contamos con el equipo necesario para este tipo de falla"
+        ></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="cerrarRechazar()">Cancelar</button>
+        <button class="btn-danger" (click)="confirmarRechazar()">Confirmar rechazo</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MODAL ASIGNAR TÉCNICO ══════════ -->
+<div *ngIf="showAsignarTecnico" class="modal-overlay" (click)="cerrarAsignarTecnico()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">
+        <div class="modal-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/>
+          </svg>
+        </div>
+        <h2>Asignar Técnico</h2>
+      </div>
+      <button class="close-btn" (click)="cerrarAsignarTecnico()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-desc">Selecciona un técnico disponible para atender esta solicitud.</p>
+      <div class="form-group">
+        <label>Técnico disponible</label>
+        <select class="form-control" [(ngModel)]="asignarTecnicoId">
+          <option [ngValue]="null" disabled>-- Seleccionar técnico --</option>
+          <option *ngFor="let t of tecnicosDisponibles" [ngValue]="t.tecnico_id">
+            {{ t.nombre }}{{ t.especialidad ? ' · ' + t.especialidad : '' }}
+          </option>
+        </select>
+        <p *ngIf="tecnicosDisponibles.length === 0" class="sin-evidencia">No hay técnicos disponibles actualmente</p>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="cerrarAsignarTecnico()">Cancelar</button>
+        <button class="btn-submit" (click)="confirmarAsignarTecnico()" [disabled]="!asignarTecnicoId">Asignar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ MODAL DIAGNÓSTICO Y COSTO ══════════ -->
+<div *ngIf="showDiagnostico" class="modal-overlay" (click)="cerrarDiagnostico()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title">
+        <div class="modal-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+        </div>
+        <h2>Diagnóstico y Costo</h2>
+      </div>
+      <button class="close-btn" (click)="cerrarDiagnostico()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Diagnóstico / Observaciones <span class="required">*</span></label>
+        <textarea
+          class="form-control"
+          rows="4"
+          [(ngModel)]="diagnosticoObservaciones"
+          placeholder="Describe el problema encontrado y el trabajo realizado..."
+        ></textarea>
+      </div>
+      <div class="form-group">
+        <label>Costo total (Bs) <span class="required">*</span></label>
+        <input type="number" class="form-control" [(ngModel)]="diagnosticoCosto" min="0" step="0.01" placeholder="Ej: 250.00" />
+        <p *ngIf="diagnosticoCosto" class="costo-detalle">
+          Comisión plataforma (10%): <strong>{{ diagnosticoCosto * 0.10 | number:'1.2-2' }} Bs</strong> &nbsp;·&nbsp;
+          Tu ingreso (90%): <strong>{{ diagnosticoCosto * 0.90 | number:'1.2-2' }} Bs</strong>
+        </p>
+      </div>
+      <div class="form-group">
+        <label>Método de pago</label>
+        <select class="form-control" [(ngModel)]="diagnosticoMetodoPago">
+          <option value="">-- Seleccionar (opcional) --</option>
+          <option value="efectivo">Efectivo</option>
+          <option value="transferencia">Transferencia bancaria</option>
+          <option value="qr">QR / Pago digital</option>
+          <option value="tarjeta">Tarjeta</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="cerrarDiagnostico()">Cancelar</button>
+        <button class="btn-submit" (click)="confirmarDiagnostico()" [disabled]="!diagnosticoObservaciones || !diagnosticoCosto">
+          Registrar y cerrar servicio
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ TOAST ══════════ -->
+<div *ngIf="toastMsg" class="toast" [class.toast-ok]="toastType === 'ok'" [class.toast-err]="toastType === 'err'">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+    <ng-container *ngIf="toastType === 'ok'">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+    </ng-container>
+    <ng-container *ngIf="toastType === 'err'">
+      <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+    </ng-container>
+  </svg>
+  {{ toastMsg }}
+</div>

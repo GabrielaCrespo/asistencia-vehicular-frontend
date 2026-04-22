@@ -126,9 +126,38 @@
                     {{ tecnico.disponible ? 'Disponible' : 'No disponible' }}
                   </span>
                 </td>
-                <td class="text-secondary text-sm">{{ tecnico.fecha_ultima_ubicacion || '—' }}</td>
+                <td>
+                  <div class="location-cell">
+                    <ng-container *ngIf="tecnico.latitud_actual != null; else sinUbicacion">
+                      <button class="location-link" (click)="abrirUbicacion(tecnico)" title="Ver en mapa">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        {{ tecnico.latitud_actual | number:'1.4-4' }}, {{ tecnico.longitud_actual | number:'1.4-4' }}
+                      </button>
+                      <span class="location-date text-secondary text-sm">{{ tecnico.fecha_ultima_ubicacion | date:'dd/MM HH:mm' }}</span>
+                    </ng-container>
+                    <ng-template #sinUbicacion>
+                      <span class="text-secondary text-sm">Sin ubicación</span>
+                    </ng-template>
+                  </div>
+                </td>
                 <td>
                   <div class="actions">
+                    <button
+                      class="action-btn toggle-btn"
+                      [class.toggle-on]="tecnico.disponible"
+                      [class.toggle-off]="!tecnico.disponible"
+                      (click)="toggleDisponible(tecnico)"
+                      [title]="tecnico.disponible ? 'Marcar no disponible' : 'Marcar disponible'">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path *ngIf="tecnico.disponible" d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline *ngIf="tecnico.disponible" points="22 4 12 14.01 9 11.01"/>
+                        <circle *ngIf="!tecnico.disponible" cx="12" cy="12" r="10"/>
+                        <line *ngIf="!tecnico.disponible" x1="15" y1="9" x2="9" y2="15"/>
+                        <line *ngIf="!tecnico.disponible" x1="9" y1="9" x2="15" y2="15"/>
+                      </svg>
+                    </button>
                     <button class="action-btn edit" (click)="abrirModalEditar(tecnico)" title="Editar">
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
