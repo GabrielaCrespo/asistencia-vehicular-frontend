@@ -53,6 +53,12 @@ export class SolicitudesComponent implements OnInit, OnDestroy {
   rechazarIncidenteId: number | null = null;
   rechazarObservaciones = '';
 
+  // Accept confirmation modal
+  showAceptarModal = false;
+  aceptarSolicitudActual: SolicitudDisponible | null = null;
+  aceptarTecnicoId: number | null = null;
+  aceptarTiempoEstimado: number | null = null;
+
   // Asignar técnico modal
   showAsignarTecnico = false;
   asignarAsignacionId: number | null = null;
@@ -71,6 +77,8 @@ export class SolicitudesComponent implements OnInit, OnDestroy {
   toastType: 'ok' | 'err' = 'ok';
   private toastTimer: any;
 
+  hayTecnicosDisponibles = true;
+
   ngOnInit() {
     this.authService.auth$
       .pipe(takeUntil(this.destroy$))
@@ -81,6 +89,12 @@ export class SolicitudesComponent implements OnInit, OnDestroy {
           this.tecnicosService.listarTecnicos(authState.currentUser.taller_id)
             .pipe(takeUntil(this.destroy$)).subscribe();
         }
+      });
+
+    this.tecnicosService.getTecnicos$()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(tecnicos => {
+        this.hayTecnicosDisponibles = tecnicos.some(t => t.disponible);
       });
   }
 
@@ -120,19 +134,38 @@ export class SolicitudesComponent implements OnInit, OnDestroy {
     this.detalle = null;
   }
 
-  aceptar(solicitud: SolicitudDisponible) {
-    if (!this.currentUser) return;
+  abrirAceptarModal(s: SolicitudDisponible) {
+    this.aceptarSolicitudActual = s;
+    this.aceptarTecnicoId = null;
+    this.aceptarTiempoEstimado = null;
+    this.tecnicosService.getTecnicos$().pipe(takeUntil(this.destroy$)).subscribe(t => {
+      this.tecnicosDisponibles = t.filter(tc => tc.disponible);
+    });
+    this.showAceptarModal = true;
+  }
+
+  confirmarAceptar() {
+    if (!this.currentUser || !this.aceptarSolicitudActual) return;
     this.solicitudesService
-      .aceptarSolicitud(this.currentUser.taller_id, { incidente_id: solicitud.incidente_id })
+      .aceptarSolicitud(this.currentUser.taller_id, {
+        incidente_id: this.aceptarSolicitudActual.incidente_id,
+        tecnico_id: this.aceptarTecnicoId ?? undefined,
+        tiempo_estimado_minutos: this.aceptarTiempoEstimado ?? undefined,
+      })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
+          this.showAceptarModal = false;
           this.mostrarToast('Solicitud aceptada correctamente', 'ok');
-          this.solicitudesService.cargarAsignadas(this.currentUser!.taller_id)
-            .pipe(takeUntil(this.destroy$)).subscribe();
+          this.setTab('asignadas');
         },
         error: (e) => this.mostrarToast(e.message || 'Error al aceptar', 'err'),
       });
+  }
+
+  cerrarAceptarModal() {
+    this.showAceptarModal = false;
+    this.aceptarSolicitudActual = null;
   }
 
   abrirRechazar(incidenteId: number) {
@@ -168,14 +201,20 @@ export class SolicitudesComponent implements OnInit, OnDestroy {
   }
 
   imagenUrl(path: string): string {
-    // path viene como "imagenes_incidentes/uuid.ext" — lo convertimos en URL completa
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      return path;
+    }
+    // compatibilidad con paths locales anteriores: "imagenes_incidentes/uuid.ext"
     const clean = path.startsWith('/') ? path.slice(1) : path;
     const filename = clean.replace(/^imagenes_incidentes\//, '');
     return `${environment.api.baseUrl}/imagenes/${filename}`;
   }
 
   onImgError(event: Event) {
-    (event.target as HTMLImageElement).style.display = 'none';
+    const img = event.target as HTMLImageElement;
+    img.style.display = 'none';
+    const fallback = img.nextElementSibling as HTMLElement | null;
+    if (fallback) fallback.style.display = 'block';
   }
 
   estadoBadgeClass(estado: string): string {
@@ -300,6 +339,56 @@ export class SolicitudesComponent implements OnInit, OnDestroy {
       completada: 'Completada',
     };
     return map[estado] ?? estado;
+  }
+
+  etiquetaEstadoDisplay(estado: string): string {
+    const map: Record<string, string> = {
+      aceptada:    'Aceptada',
+      en_camino:   'En camino',
+      en_servicio: 'En servicio',
+      completada:  'Completada',
+      rechazada:   'Rechazada',
+      pendiente:   'Pendiente',
+      asignada:    'Asignada',
+    };
+    return map[estado] ?? estado;
+  }
+
+  getStepClass(estadoActual: string, stepEstado: string): string {
+    const order = ['aceptada', 'en_camino', 'en_servicio', 'completada'];
+    const ci = order.indexOf(estadoActual);
+    const si = order.indexOf(stepEstado);
+    if (ci > si) return 'step-done';
+    if (ci === si) return 'step-active';
+    return 'step-pending';
+  }
+
+  ctaLabel(estado: string): string {
+    const map: Record<string, string> = {
+      aceptada:    'Técnico en camino',
+      en_camino:   'Técnico llegó · Iniciar servicio',
+      en_servicio: 'Completar y registrar diagnóstico',
+    };
+    return map[estado] ?? '';
+  }
+
+  ctaClass(estado: string): string {
+    const map: Record<string, string> = {
+      aceptada:    'cta-camino',
+      en_camino:   'cta-servicio',
+      en_servicio: 'cta-completar',
+    };
+    return map[estado] ?? '';
+  }
+
+  onCtaClick(a: SolicitudAsignada) {
+    if (a.estado === 'aceptada') {
+      this.actualizarEstado(a, 'en_camino');
+    } else if (a.estado === 'en_camino') {
+      this.actualizarEstado(a, 'en_servicio');
+    } else if (a.estado === 'en_servicio') {
+      this.abrirDiagnostico(a);
+    }
   }
 
   private mostrarToast(msg: string, type: 'ok' | 'err') {

@@ -8,12 +8,14 @@ export interface SolicitudDisponible {
   fecha_creacion: string;
   imagen_path: string | null;
   audio_path: string | null;
+  tipo_problema: string | null;
   cliente_nombre: string;
   cliente_telefono: string;
   marca: string;
   modelo: string;
   placa: string;
   vehiculo_tipo: string | null;
+  distancia_km: number | null;
 }
 
 export interface SolicitudAsignada {

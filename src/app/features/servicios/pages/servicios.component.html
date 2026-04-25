@@ -18,18 +18,16 @@
           </div>
           <div>
             <h1>Servicios</h1>
-            <p class="header-subtitle">Catálogo de servicios del taller</p>
+            <p class="header-subtitle">Cobertura de emergencias del taller</p>
           </div>
         </div>
       </div>
-      <div class="header-actions">
-        <button class="btn-add" (click)="abrirModalCrear()">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-          </svg>
-          Nuevo servicio
-        </button>
-      </div>
+      <button class="btn-add" (click)="abrirModalCrear()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Nuevo servicio
+      </button>
     </div>
   </header>
 
@@ -66,7 +64,8 @@
           <div class="stat-icon" style="--ic:#fff1f2;--cc:#f43f5e">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="12" cy="12" r="10"/>
-              <line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+              <line x1="15" y1="9" x2="9" y2="15"/>
+              <line x1="9" y1="9" x2="15" y2="15"/>
             </svg>
           </div>
           <div>
@@ -74,15 +73,115 @@
             <p class="stat-val">{{ stats.noDisponibles }}</p>
           </div>
         </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="--ic:#ebf6f5;--cc:#5cbdb9">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+            </svg>
+          </div>
+          <div>
+            <p class="stat-label">Categorías activas</p>
+            <p class="stat-val">{{ categoriasActivas() }}</p>
+          </div>
+        </div>
       </div>
 
-      <!-- Alertas -->
+      <!-- Loading -->
       <div *ngIf="loading$ | async" class="alert alert-info">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
         </svg>
         Cargando servicios...
       </div>
+
+      <!-- ── SECCIÓN: COBERTURA ── -->
+      <div class="section">
+        <div class="section-header">
+          <div>
+            <h3>¿Qué emergencias atiendes?</h3>
+            <p class="section-desc">Activa las categorías que tu taller puede cubrir. Las solicitudes llegarán según tus servicios activos, distancia y disponibilidad.</p>
+          </div>
+        </div>
+
+        <div class="categoria-grid">
+          <div
+            class="categoria-card"
+            *ngFor="let cat of CATEGORIAS"
+            [class.cat-active]="getCoberturaActiva(cat.id)"
+            [attr.data-cat]="cat.id">
+
+            <div class="cat-icon-col">
+              <div class="cat-icon-wrap">
+                <!-- AUXILIO -->
+                <ng-container *ngIf="cat.id === 'AUXILIO'">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="16"/>
+                    <line x1="8" y1="12" x2="16" y2="12"/>
+                  </svg>
+                </ng-container>
+                <!-- MECANICA -->
+                <ng-container *ngIf="cat.id === 'MECANICA'">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                  </svg>
+                </ng-container>
+                <!-- ELECTRICO -->
+                <ng-container *ngIf="cat.id === 'ELECTRICO'">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                  </svg>
+                </ng-container>
+                <!-- GRUA -->
+                <ng-container *ngIf="cat.id === 'GRUA'">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="1" y="3" width="15" height="13" rx="2"/>
+                    <path d="M16 8h4l3 5v3h-7V8z"/>
+                    <circle cx="5.5" cy="18.5" r="2.5"/>
+                    <circle cx="18.5" cy="18.5" r="2.5"/>
+                  </svg>
+                </ng-container>
+                <!-- OTROS -->
+                <ng-container *ngIf="cat.id === 'OTROS'">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+                  </svg>
+                </ng-container>
+              </div>
+            </div>
+
+            <div class="cat-body">
+              <div class="cat-name-row">
+                <h4 class="cat-label">{{ cat.label }}</h4>
+                <span class="cat-count-badge">
+                  {{ getServiciosDeCategoria(cat.id).length }}
+                  {{ getServiciosDeCategoria(cat.id).length === 1 ? 'servicio' : 'servicios' }}
+                </span>
+              </div>
+              <p class="cat-sub">{{ cat.subLabel }}</p>
+            </div>
+
+            <div class="cat-toggle-col">
+              <span class="estado-tag" [class.tag-on]="getCoberturaActiva(cat.id)" [class.tag-off]="!getCoberturaActiva(cat.id)">
+                {{ getCoberturaActiva(cat.id) ? 'Activo' : 'Inactivo' }}
+              </span>
+              <button
+                class="toggle-pill"
+                [class.toggle-on]="getCoberturaActiva(cat.id)"
+                [class.toggle-spinning]="toggling === cat.id"
+                (click)="toggleCategoria(cat)"
+                [disabled]="!!toggling">
+                <span class="toggle-thumb"></span>
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Error -->
       <div *ngIf="error$ | async as error" class="alert alert-error">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
@@ -90,10 +189,10 @@
         {{ error }}
       </div>
 
-      <!-- Panel tabla -->
+      <!-- ── Panel tabla de servicios ── -->
       <div class="panel" *ngIf="(servicios_taller$ | async) as servicios">
         <div class="panel-header">
-          <h3>Servicios del Taller</h3>
+          <h3>Todos los Servicios</h3>
           <span class="panel-tag">{{ servicios.length }} {{ servicios.length === 1 ? 'servicio' : 'servicios' }}</span>
         </div>
 
@@ -103,8 +202,7 @@
               <tr>
                 <th>Servicio</th>
                 <th>Categoría</th>
-                <th>Precio base</th>
-                <th>Precio taller</th>
+                <th>Precio</th>
                 <th>Estado</th>
                 <th>Acciones</th>
               </tr>
@@ -113,8 +211,8 @@
               <tr *ngFor="let servicio of servicios" [class.row-inactive]="!servicio.disponible">
                 <td>
                   <div class="service-cell">
-                    <div class="service-icon-wrap">
-                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <div class="service-icon" [attr.data-cat]="servicio.categoria">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
                       </svg>
                     </div>
@@ -125,30 +223,36 @@
                   </div>
                 </td>
                 <td>
-                  <span *ngIf="servicio.categoria" class="categoria-pill">{{ servicio.categoria }}</span>
+                  <span *ngIf="servicio.categoria" class="cat-pill"
+                    [class.pill-auxilio]="servicio.categoria === 'AUXILIO'"
+                    [class.pill-mecanica]="servicio.categoria === 'MECANICA'"
+                    [class.pill-electrico]="servicio.categoria === 'ELECTRICO'"
+                    [class.pill-grua]="servicio.categoria === 'GRUA'"
+                    [class.pill-otros]="servicio.categoria === 'OTROS'">
+                    {{ servicio.categoria }}
+                  </span>
                   <span *ngIf="!servicio.categoria" class="text-secondary">—</span>
                 </td>
-                <td class="price text-secondary">${{ servicio.precio_base.toFixed(2) }}</td>
-                <td class="price">
-                  <span *ngIf="servicio.precio_personalizado" class="price-custom">
-                    ${{ servicio.precio_personalizado!.toFixed(2) }}
+                <td>
+                  <span *ngIf="getPrecio(servicio) > 0" class="price-val">
+                    ${{ getPrecio(servicio).toFixed(2) }}
                   </span>
-                  <span *ngIf="!servicio.precio_personalizado" class="text-secondary">—</span>
+                  <span *ngIf="getPrecio(servicio) === 0" class="text-secondary">—</span>
                 </td>
                 <td>
                   <span class="badge" [class.badge-ok]="servicio.disponible" [class.badge-off]="!servicio.disponible">
-                    {{ servicio.disponible ? 'Disponible' : 'No disponible' }}
+                    {{ servicio.disponible ? 'Disponible' : 'Inactivo' }}
                   </span>
                 </td>
                 <td>
                   <div class="actions">
-                    <button class="action-btn edit" (click)="abrirModalEditar(servicio)" title="Editar precio/disponibilidad">
+                    <button class="action-btn edit" (click)="abrirModalEditar(servicio)" title="Editar">
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                       </svg>
                     </button>
-                    <button class="action-btn delete" (click)="removerServicio(servicio)" title="Remover del taller">
+                    <button class="action-btn delete" (click)="removerServicio(servicio)" title="Eliminar">
                       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="3 6 5 6 21 6"/>
                         <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
@@ -171,12 +275,12 @@
               </svg>
             </div>
             <p class="empty-title">Sin servicios registrados</p>
-            <p class="empty-desc">Crea el primer servicio que ofrece tu taller</p>
+            <p class="empty-desc">Activa una categoría arriba o agrega un servicio personalizado</p>
             <button class="btn-add" (click)="abrirModalCrear()">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
               </svg>
-              Nuevo servicio
+              Agregar servicio
             </button>
           </div>
         </ng-template>
@@ -184,7 +288,6 @@
 
     </div>
   </main>
-
 </div>
 
 <!-- ── MODAL: NUEVO SERVICIO ── -->
@@ -213,68 +316,51 @@
       <div class="form-group">
         <label for="nuevo-nombre">Nombre <span class="required">*</span></label>
         <input
-          id="nuevo-nombre"
-          type="text"
-          class="form-control"
+          id="nuevo-nombre" type="text" class="form-control"
           [class.invalid]="formCrear.get('nombre')?.invalid && formCrear.get('nombre')?.touched"
-          formControlName="nombre"
-          placeholder="Ej: Cambio de aceite"
-        />
-        <span *ngIf="formCrear.get('nombre')?.hasError('required') && formCrear.get('nombre')?.touched" class="error-text">
-          Campo requerido
-        </span>
-        <span *ngIf="formCrear.get('nombre')?.hasError('minlength') && formCrear.get('nombre')?.touched" class="error-text">
-          Mínimo 3 caracteres
-        </span>
+          formControlName="nombre" placeholder="Ej: Cambio de aceite y filtro"/>
+        <span *ngIf="formCrear.get('nombre')?.hasError('required') && formCrear.get('nombre')?.touched" class="error-text">Campo requerido</span>
+        <span *ngIf="formCrear.get('nombre')?.hasError('minlength') && formCrear.get('nombre')?.touched" class="error-text">Mínimo 3 caracteres</span>
       </div>
 
       <div class="form-group">
         <label for="nuevo-descripcion">Descripción</label>
-        <textarea
-          id="nuevo-descripcion"
-          class="form-control"
-          formControlName="descripcion"
-          placeholder="Descripción breve del servicio..."
-          rows="2"
-        ></textarea>
+        <textarea id="nuevo-descripcion" class="form-control" formControlName="descripcion"
+          placeholder="Descripción breve del servicio..." rows="2"></textarea>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label for="nuevo-categoria">Categoría</label>
-          <input
-            id="nuevo-categoria"
-            type="text"
-            class="form-control"
-            formControlName="categoria"
-            placeholder="Ej: Mecanica"
-          />
+          <label for="nuevo-categoria">Categoría <span class="required">*</span></label>
+          <select id="nuevo-categoria" class="form-control"
+            [class.invalid]="formCrear.get('categoria')?.invalid && formCrear.get('categoria')?.touched"
+            formControlName="categoria">
+            <option value="" disabled>— Seleccionar —</option>
+            <option value="AUXILIO">Auxilio Vial</option>
+            <option value="MECANICA">Mecánica General</option>
+            <option value="ELECTRICO">Eléctrico</option>
+            <option value="GRUA">Grúa y Remolque</option>
+            <option value="OTROS">Asistencia General</option>
+          </select>
+          <span *ngIf="formCrear.get('categoria')?.hasError('required') && formCrear.get('categoria')?.touched" class="error-text">Selecciona una categoría</span>
         </div>
         <div class="form-group">
           <label for="nuevo-precio">Precio <span class="required">*</span></label>
           <div class="input-prefix-wrap">
             <span class="input-prefix">$</span>
-            <input
-              id="nuevo-precio"
-              type="number"
-              step="0.01"
-              min="0"
+            <input id="nuevo-precio" type="number" step="0.01" min="0"
               class="form-control with-prefix"
               [class.invalid]="formCrear.get('precio')?.invalid && formCrear.get('precio')?.touched"
-              formControlName="precio"
-              placeholder="0.00"
-            />
+              formControlName="precio" placeholder="0.00"/>
           </div>
-          <span *ngIf="formCrear.get('precio')?.hasError('required') && formCrear.get('precio')?.touched" class="error-text">
-            Campo requerido
-          </span>
+          <span *ngIf="formCrear.get('precio')?.hasError('required') && formCrear.get('precio')?.touched" class="error-text">Campo requerido</span>
         </div>
       </div>
 
       <div class="form-group">
         <label class="toggle-label">
           <div class="toggle-wrapper">
-            <input type="checkbox" formControlName="disponible" class="toggle-input" />
+            <input type="checkbox" formControlName="disponible" class="toggle-input"/>
             <span class="toggle-track"></span>
           </div>
           Disponible para clientes
@@ -283,9 +369,7 @@
 
       <div class="modal-actions">
         <button type="button" class="btn-cancel" (click)="cerrarModal()">Cancelar</button>
-        <button type="submit" class="btn-submit" [disabled]="!formCrear.valid">
-          Crear servicio
-        </button>
+        <button type="submit" class="btn-submit" [disabled]="!formCrear.valid">Crear servicio</button>
       </div>
     </form>
   </div>
@@ -324,22 +408,16 @@
         <label for="precio-edit">Nuevo precio</label>
         <div class="input-prefix-wrap">
           <span class="input-prefix">$</span>
-          <input
-            id="precio-edit"
-            type="number"
-            step="0.01"
-            min="0"
-            class="form-control with-prefix"
-            formControlName="precio_personalizado"
-            placeholder="Dejar vacío para mantener el actual"
-          />
+          <input id="precio-edit" type="number" step="0.01" min="0"
+            class="form-control with-prefix" formControlName="precio_personalizado"
+            placeholder="Dejar vacío para mantener el actual"/>
         </div>
       </div>
 
       <div class="form-group">
         <label class="toggle-label">
           <div class="toggle-wrapper">
-            <input type="checkbox" formControlName="disponible" class="toggle-input" />
+            <input type="checkbox" formControlName="disponible" class="toggle-input"/>
             <span class="toggle-track"></span>
           </div>
           Disponible para clientes
@@ -352,4 +430,17 @@
       </div>
     </form>
   </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div *ngIf="toastMsg" class="toast" [class.toast-ok]="toastType === 'ok'" [class.toast-err]="toastType === 'err'">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+    <ng-container *ngIf="toastType === 'ok'">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+    </ng-container>
+    <ng-container *ngIf="toastType === 'err'">
+      <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+    </ng-container>
+  </svg>
+  {{ toastMsg }}
 </div>

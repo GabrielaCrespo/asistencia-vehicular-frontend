@@ -7,7 +7,9 @@ import { map, takeUntil } from 'rxjs/operators';
 
 import { AuthService } from '../../../core/auth/auth.service';
 import { TecnicosService } from '../../../core/services/tecnicos.service';
+import { ServiciosService } from '../../../core/services/servicios.service';
 import { Tecnico, TecnicoCreateRequest, TecnicoUpdateRequest } from '../../../core/models/tecnicos.models';
+import { TallerServicio } from '../../../core/models/servicios.models';
 import { CurrentUser } from '../../../core/models/auth.models';
 
 @Component({
@@ -20,6 +22,7 @@ import { CurrentUser } from '../../../core/models/auth.models';
 export class TecnicosComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private tecnicosService = inject(TecnicosService);
+  private serviciosService = inject(ServiciosService);
   private fb = inject(FormBuilder);
   private destroy$ = new Subject<void>();
 
@@ -40,6 +43,14 @@ export class TecnicosComponent implements OnInit, OnDestroy {
   isEditMode = false;
   selectedTecnico: Tecnico | null = null;
 
+  serviciosTaller: TallerServicio[] = [];
+  loadingServicios = false;
+  especialidadSeleccionada = '';
+
+  toastMsg = '';
+  toastType: 'ok' | 'err' = 'ok';
+  private toastTimer: any;
+
   formulario!: FormGroup;
 
   ngOnInit() {
@@ -50,9 +61,35 @@ export class TecnicosComponent implements OnInit, OnDestroy {
   private setupForm() {
     this.formulario = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(3)]],
-      especialidad: [''],
       disponible: [true]
     });
+  }
+
+  private cargarServiciosTaller() {
+    if (!this.currentUser) return;
+    this.loadingServicios = true;
+    this.serviciosService.listarServiciosTaller(this.currentUser.taller_id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (servicios) => {
+          this.serviciosTaller = servicios;
+          this.loadingServicios = false;
+        },
+        error: () => { this.loadingServicios = false; }
+      });
+  }
+
+  seleccionarEspecialidad(nombre: string) {
+    this.especialidadSeleccionada = this.especialidadSeleccionada === nombre ? '' : nombre;
+  }
+
+  isEspecialidadSelected(nombre: string): boolean {
+    return this.especialidadSeleccionada === nombre;
+  }
+
+  especialidadesArray(especialidad: string | null | undefined): string[] {
+    if (!especialidad) return [];
+    return especialidad.split(',').map(s => s.trim()).filter(Boolean);
   }
 
   private loadUserAndTecnicos() {
@@ -64,6 +101,7 @@ export class TecnicosComponent implements OnInit, OnDestroy {
           this.tecnicosService.listarTecnicos(authState.currentUser.taller_id)
             .pipe(takeUntil(this.destroy$))
             .subscribe();
+          this.cargarServiciosTaller();
         }
       });
   }
@@ -71,6 +109,7 @@ export class TecnicosComponent implements OnInit, OnDestroy {
   abrirModalCrear() {
     this.isEditMode = false;
     this.selectedTecnico = null;
+    this.especialidadSeleccionada = '';
     this.formulario.reset({ disponible: true });
     this.showFormModal = true;
   }
@@ -78,16 +117,14 @@ export class TecnicosComponent implements OnInit, OnDestroy {
   abrirModalEditar(tecnico: Tecnico) {
     this.isEditMode = true;
     this.selectedTecnico = tecnico;
-    this.formulario.patchValue({
-      nombre: tecnico.nombre,
-      especialidad: tecnico.especialidad,
-      disponible: tecnico.disponible
-    });
+    this.especialidadSeleccionada = tecnico.especialidad?.trim() ?? '';
+    this.formulario.patchValue({ nombre: tecnico.nombre, disponible: tecnico.disponible });
     this.showFormModal = true;
   }
 
   cerrarModal() {
     this.showFormModal = false;
+    this.especialidadSeleccionada = '';
     this.formulario.reset({ disponible: true });
     this.selectedTecnico = null;
   }
@@ -96,30 +133,22 @@ export class TecnicosComponent implements OnInit, OnDestroy {
     if (!this.formulario.valid || !this.currentUser) return;
 
     const datos = this.formulario.value;
+    const especialidad = this.especialidadSeleccionada || undefined;
 
     if (this.isEditMode && this.selectedTecnico) {
-      const updateData: TecnicoUpdateRequest = {
-        nombre: datos.nombre,
-        especialidad: datos.especialidad,
-        disponible: datos.disponible
-      };
+      const updateData: TecnicoUpdateRequest = { nombre: datos.nombre, especialidad, disponible: datos.disponible };
       this.tecnicosService.actualizarTecnico(
-        this.currentUser.taller_id,
-        this.selectedTecnico.tecnico_id,
-        updateData
+        this.currentUser.taller_id, this.selectedTecnico.tecnico_id, updateData
       ).pipe(takeUntil(this.destroy$)).subscribe({
-        next: () => this.cerrarModal(),
-        error: (err) => console.error('Error actualizando técnico:', err)
+        next: () => { this.cerrarModal(); this.mostrarToast('Técnico actualizado correctamente', 'ok'); },
+        error: (err) => this.mostrarToast(err.message || 'Error actualizando técnico', 'err')
       });
     } else {
-      const createData: TecnicoCreateRequest = {
-        nombre: datos.nombre,
-        especialidad: datos.especialidad
-      };
+      const createData: TecnicoCreateRequest = { nombre: datos.nombre, especialidad };
       this.tecnicosService.crearTecnico(this.currentUser.taller_id, createData)
         .pipe(takeUntil(this.destroy$)).subscribe({
-          next: () => this.cerrarModal(),
-          error: (err) => console.error('Error creando técnico:', err)
+          next: () => { this.cerrarModal(); this.mostrarToast('Técnico creado correctamente', 'ok'); },
+          error: (err) => this.mostrarToast(err.message || 'Error creando técnico', 'err')
         });
     }
   }
@@ -131,7 +160,8 @@ export class TecnicosComponent implements OnInit, OnDestroy {
       tecnico.tecnico_id,
       { disponible: !tecnico.disponible }
     ).pipe(takeUntil(this.destroy$)).subscribe({
-      error: (err) => console.error('Error actualizando disponibilidad:', err)
+      next: () => this.mostrarToast(`${tecnico.nombre} marcado como ${!tecnico.disponible ? 'disponible' : 'no disponible'}`, 'ok'),
+      error: (err) => this.mostrarToast(err.message || 'Error actualizando disponibilidad', 'err')
     });
   }
 
@@ -146,13 +176,22 @@ export class TecnicosComponent implements OnInit, OnDestroy {
     if (confirm(`¿Eliminar técnico "${tecnico.nombre}"?`)) {
       this.tecnicosService.eliminarTecnico(this.currentUser.taller_id, tecnico.tecnico_id)
         .pipe(takeUntil(this.destroy$)).subscribe({
-          error: (err) => console.error('Error eliminando técnico:', err)
+          next: () => this.mostrarToast('Técnico eliminado', 'ok'),
+          error: (err) => this.mostrarToast(err.message || 'Error eliminando técnico', 'err')
         });
     }
+  }
+
+  mostrarToast(msg: string, type: 'ok' | 'err') {
+    clearTimeout(this.toastTimer);
+    this.toastMsg = msg;
+    this.toastType = type;
+    this.toastTimer = setTimeout(() => { this.toastMsg = ''; }, 4500);
   }
 
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
+    clearTimeout(this.toastTimer);
   }
 }

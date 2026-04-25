@@ -79,8 +79,8 @@ export class PerfilComponent implements OnInit {
       razon_social: [p.razon_social, [Validators.required, Validators.minLength(2)]],
       direccion: [p.direccion, [Validators.required]],
       telefono_operativo: [p.telefono_operativo, [Validators.required, Validators.minLength(7)]],
-      horario_inicio: [p.horario_inicio, [Validators.required]],
-      horario_fin: [p.horario_fin, [Validators.required]],
+      horario_inicio: [p.horario_inicio, [Validators.required, Validators.pattern('^([01][0-9]|2[0-3]):[0-5][0-9]$')]],
+      horario_fin: [p.horario_fin, [Validators.required, Validators.pattern('^([01][0-9]|2[0-3]):[0-5][0-9]$')]],
     });
   }
 

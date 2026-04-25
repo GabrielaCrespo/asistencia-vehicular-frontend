@@ -209,16 +209,18 @@
             </div>
             <div class="form-row">
               <div class="field">
-                <label>Horario inicio</label>
-                <input formControlName="horario_inicio" type="time"
+                <label>Horario inicio (formato 24h)</label>
+                <input formControlName="horario_inicio" type="text" placeholder="HH:MM (ej: 08:00)" maxlength="5"
                   [class.invalid]="f['horario_inicio'].invalid && f['horario_inicio'].touched">
-                <span class="field-error" *ngIf="f['horario_inicio'].invalid && f['horario_inicio'].touched">Requerido</span>
+                <span class="field-error" *ngIf="f['horario_inicio'].hasError('required') && f['horario_inicio'].touched">Requerido</span>
+                <span class="field-error" *ngIf="f['horario_inicio'].hasError('pattern') && f['horario_inicio'].touched">Formato inválido. Use HH:MM (ej: 08:00, 23:59)</span>
               </div>
               <div class="field">
-                <label>Horario fin</label>
-                <input formControlName="horario_fin" type="time"
+                <label>Horario fin (formato 24h)</label>
+                <input formControlName="horario_fin" type="text" placeholder="HH:MM (ej: 22:00)" maxlength="5"
                   [class.invalid]="f['horario_fin'].invalid && f['horario_fin'].touched">
-                <span class="field-error" *ngIf="f['horario_fin'].invalid && f['horario_fin'].touched">Requerido</span>
+                <span class="field-error" *ngIf="f['horario_fin'].hasError('required') && f['horario_fin'].touched">Requerido</span>
+                <span class="field-error" *ngIf="f['horario_fin'].hasError('pattern') && f['horario_fin'].touched">Formato inválido. Use HH:MM (ej: 08:00, 23:59)</span>
               </div>
             </div>
           </div>

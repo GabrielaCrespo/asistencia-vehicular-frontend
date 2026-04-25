@@ -98,8 +98,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
       ruc:                ['', [Validators.required, Validators.minLength(5)]],
       direccion:          ['', [Validators.required, Validators.minLength(5)]],
       telefono_operativo: ['', [Validators.required, Validators.minLength(8)]],
-      horario_inicio:     ['', Validators.required],
-      horario_fin:        ['', Validators.required],
+      horario_inicio:     ['', [Validators.required, Validators.pattern('^([01][0-9]|2[0-3]):[0-5][0-9]$')]],
+      horario_fin:        ['', [Validators.required, Validators.pattern('^([01][0-9]|2[0-3]):[0-5][0-9]$')]],
       latitud:            [null, Validators.required],
       longitud:           [null, Validators.required],
     });

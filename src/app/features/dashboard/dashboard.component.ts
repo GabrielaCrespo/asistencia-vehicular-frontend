@@ -15,8 +15,9 @@ import { environment } from '../../environments/environment';
 interface NavItem {
   label: string;
   url: string;
-  icon: string;
   description: string;
+  color: string;
+  bgColor: string;
 }
 
 @Component({
@@ -35,9 +36,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   showMobileMenu = false;
 
   navItems: NavItem[] = [
-    { label: 'Solicitudes', url: '/solicitudes', icon: '📋', description: 'Ver y gestionar solicitudes de clientes' },
-    { label: 'Técnicos',   url: '/tecnicos',    icon: '👨‍🔧', description: 'Gestiona los técnicos de tu taller' },
-    { label: 'Servicios',  url: '/servicios',   icon: '🔧',  description: 'Configura servicios ofrecidos' },
+    { label: 'Solicitudes', url: '/solicitudes', description: 'Recibe y gestiona emergencias en tiempo real',        color: '#f97316', bgColor: '#fff7ed' },
+    { label: 'Técnicos',   url: '/tecnicos',    description: 'Administra la disponibilidad de tu equipo',           color: '#5cbdb9', bgColor: '#ebf6f5' },
+    { label: 'Servicios',  url: '/servicios',   description: 'Configura coberturas y precios de tus servicios',     color: '#3b82f6', bgColor: '#eff6ff' },
+    { label: 'Perfil',     url: '/perfil',      description: 'Actualiza la información y horario de tu taller',     color: '#8b5cf6', bgColor: '#f5f3ff' },
   ];
 
   ngOnInit(): void {

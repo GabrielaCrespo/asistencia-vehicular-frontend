@@ -262,27 +262,29 @@
 
           <div class="two-col">
             <div class="field-group">
-              <label for="horario_inicio" class="field-label">Hora apertura</label>
+              <label for="horario_inicio" class="field-label">Hora apertura (formato 24h)</label>
               <div class="input-wrapper" [class.has-error]="horarioInicioControl?.invalid && horarioInicioControl?.touched">
                 <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="12" cy="12" r="10"/>
                   <polyline points="12 6 12 12 16 14"/>
                 </svg>
-                <input id="horario_inicio" type="time" formControlName="horario_inicio" class="field-input"/>
+                <input id="horario_inicio" type="text" formControlName="horario_inicio" class="field-input" placeholder="HH:MM (ej: 08:00)" maxlength="5"/>
               </div>
-              <span *ngIf="horarioInicioControl?.invalid && horarioInicioControl?.touched" class="field-error">Requerido</span>
+              <span *ngIf="horarioInicioControl?.hasError('required') && horarioInicioControl?.touched" class="field-error">Requerido</span>
+              <span *ngIf="horarioInicioControl?.hasError('pattern') && horarioInicioControl?.touched" class="field-error">Formato inválido. Use HH:MM (ej: 08:00, 23:59)</span>
             </div>
 
             <div class="field-group">
-              <label for="horario_fin" class="field-label">Hora cierre</label>
+              <label for="horario_fin" class="field-label">Hora cierre (formato 24h)</label>
               <div class="input-wrapper" [class.has-error]="horarioFinControl?.invalid && horarioFinControl?.touched">
                 <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="12" cy="12" r="10"/>
                   <polyline points="12 6 12 12 16 14"/>
                 </svg>
-                <input id="horario_fin" type="time" formControlName="horario_fin" class="field-input"/>
+                <input id="horario_fin" type="text" formControlName="horario_fin" class="field-input" placeholder="HH:MM (ej: 22:00)" maxlength="5"/>
               </div>
-              <span *ngIf="horarioFinControl?.invalid && horarioFinControl?.touched" class="field-error">Requerido</span>
+              <span *ngIf="horarioFinControl?.hasError('required') && horarioFinControl?.touched" class="field-error">Requerido</span>
+              <span *ngIf="horarioFinControl?.hasError('pattern') && horarioFinControl?.touched" class="field-error">Formato inválido. Use HH:MM (ej: 08:00, 23:59)</span>
             </div>
           </div>
 

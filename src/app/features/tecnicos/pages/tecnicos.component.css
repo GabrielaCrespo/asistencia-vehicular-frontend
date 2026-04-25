@@ -719,3 +719,115 @@
     display: none;
   }
 }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.85rem 1.25rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  z-index: 2000;
+  max-width: 420px;
+  animation: toastIn 0.25s ease;
+}
+
+@keyframes toastIn {
+  from { transform: translateY(12px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+.toast-ok  { background: #ebf6f5; color: #0e6b67; border: 1px solid rgba(92,189,185,0.4); }
+.toast-err { background: #fff1f2; color: #be123c; border: 1px solid #fecdd3; }
+
+/* ── ESPECIALIDADES EN TABLA ── */
+.especialidades-cell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.esp-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: #e0f2f1;
+  color: #0e6b67;
+  border: 1px solid #b2dfdb;
+  white-space: nowrap;
+}
+
+/* ── SELECTOR DE SERVICIOS EN MODAL ── */
+.label-optional {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #94a3b8;
+}
+
+.servicios-loading,
+.servicios-empty {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  color: #64748b;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+}
+
+.servicios-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.servicio-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1.5px solid #cbd5e1;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.servicio-chip:hover {
+  border-color: #5cbdb9;
+  color: #0e6b67;
+  background: #f0fdfa;
+}
+
+.servicio-chip.chip-selected {
+  background: #e0f2f1;
+  border-color: #5cbdb9;
+  color: #0e6b67;
+  font-weight: 600;
+}
+
+.chips-summary {
+  margin: 6px 0 0;
+  font-size: 0.75rem;
+  color: #5cbdb9;
+  font-weight: 600;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.spin { animation: spin 0.8s linear infinite; }

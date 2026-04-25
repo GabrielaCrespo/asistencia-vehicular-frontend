@@ -1,0 +1,35 @@
+warning: in the working copy of 'src/app/core/models/solicitudes.models.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/features/auth/pages/register/register.component.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/features/auth/pages/register/register.component.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/features/dashboard/dashboard.component.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/features/dashboard/dashboard.component.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/features/dashboard/dashboard.component.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/features/perfil/perfil.component.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/features/perfil/perfil.component.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/features/servicios/pages/servicios.component.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/features/servicios/pages/servicios.component.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/features/servicios/pages/servicios.component.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/features/solicitudes/pages/solicitudes.component.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/features/solicitudes/pages/solicitudes.component.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/features/solicitudes/pages/solicitudes.component.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/features/tecnicos/pages/tecnicos.component.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/features/tecnicos/pages/tecnicos.component.html', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/features/tecnicos/pages/tecnicos.component.ts', LF will be replaced by CRLF the next time Git touches it
+ src/app/core/models/solicitudes.models.ts          |   2 [32m+[m
+ .../auth/pages/register/register.component.html    |  14 [32m+[m[31m-[m
+ .../auth/pages/register/register.component.ts      |   4 [32m+[m[31m-[m
+ src/app/features/dashboard/dashboard.component.css | 105 [32m+[m[31m--[m
+ .../features/dashboard/dashboard.component.html    |  58 [32m+[m[31m-[m
+ src/app/features/dashboard/dashboard.component.ts  |  10 [32m+[m[31m-[m
+ src/app/features/perfil/perfil.component.html      |  14 [32m+[m[31m-[m
+ src/app/features/perfil/perfil.component.ts        |   4 [32m+[m[31m-[m
+ .../servicios/pages/servicios.component.css        | 990 [32m++++++[m[31m---------------[m
+ .../servicios/pages/servicios.component.html       | 255 [32m++++[m[31m--[m
+ .../servicios/pages/servicios.component.ts         | 133 [32m++[m[31m-[m
+ .../solicitudes/pages/solicitudes.component.css    | 325 [32m+++++++[m
+ .../solicitudes/pages/solicitudes.component.html   | 343 [32m+++++[m[31m--[m
+ .../solicitudes/pages/solicitudes.component.ts     | 103 [32m++[m[31m-[m
+ .../features/tecnicos/pages/tecnicos.component.css | 112 [32m+++[m
+ .../tecnicos/pages/tecnicos.component.html         |  61 [32m+[m[31m-[m
+ .../features/tecnicos/pages/tecnicos.component.ts  |  87 [32m+[m[31m-[m
+ 17 files changed, 1572 insertions(+), 1048 deletions(-)
