@@ -682,6 +682,15 @@
 }
 
 /* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  .toast {
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+    max-width: none;
+  }
+}
+
 @media (max-width: 768px) {
   .header-inner {
     padding: 0 1rem;
@@ -715,9 +724,8 @@
     grid-template-columns: 1fr;
   }
 
-  .back-btn span {
-    display: none;
-  }
+  .back-btn { font-size: 0; gap: 0; padding: 0.4rem 0.5rem; }
+  .btn-add  { font-size: 0; gap: 0; padding: 0.55rem; }
 }
 
 /* ── TOAST ── */

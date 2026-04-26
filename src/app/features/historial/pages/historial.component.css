@@ -460,6 +460,7 @@
   .body-wrap { padding: 0 1rem; }
   .page-body { padding: 1.5rem 0 3rem; }
   .header-subtitle { display: none; }
+  .back-btn { font-size: 0; gap: 0; padding: 0.4rem 0.5rem; }
   .tabs-bar { width: 100%; flex-wrap: wrap; }
   .tab-btn { flex: 1; justify-content: center; font-size: 0.78rem; padding: 0.5rem 0.6rem; }
   .stats-grid-5 { grid-template-columns: repeat(2, 1fr); }
@@ -467,6 +468,13 @@
   .filtros-fields { grid-template-columns: 1fr; gap: 1rem; }
   .filtro-field-btn { grid-column: unset; }
   .pago-row { grid-template-columns: 1fr; }
+  .service-card-body { flex-direction: column; gap: 1rem; }
+  .service-montos { min-width: unset; }
+  .service-info { min-width: unset; }
+}
+@media (max-width: 600px) {
+  .filtros-header { flex-direction: column; align-items: flex-start; gap: 0.6rem; }
+  .filtro-actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
 }
 @media (max-width: 480px) {
   .stats-grid-5 { grid-template-columns: 1fr 1fr; }

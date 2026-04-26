@@ -6,11 +6,16 @@ import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { Subject } from 'rxjs';
+import { forkJoin } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { AuthService } from '../../core/auth/auth.service';
 import { NotificacionesService } from '../../core/services/notificaciones.service';
+import { HistorialService } from '../../core/services/historial.service';
+import { IngresosService } from '../../core/services/ingresos.service';
 import { CurrentUser } from '../../core/models/auth.models';
+import { ResumenHistorial } from '../../core/models/historial.models';
+import { ResumenIngresos } from '../../core/models/ingresos.models';
 import { environment } from '../../environments/environment';
 
 interface NavItem {
@@ -29,14 +34,20 @@ interface NavItem {
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-  private authService = inject(AuthService);
-  private notifService = inject(NotificacionesService);
+  private authService      = inject(AuthService);
+  private notifService     = inject(NotificacionesService);
+  private historialService = inject(HistorialService);
+  private ingresosService  = inject(IngresosService);
   private router = inject(Router);
   private destroy$ = new Subject<void>();
 
   currentUser: CurrentUser | null = null;
   showMobileMenu = false;
   noLeidas = 0;
+
+  historialResumen: ResumenHistorial | null = null;
+  ingresosResumen:  ResumenIngresos  | null = null;
+  loadingStats = true;
 
   navItems: NavItem[] = [
     { label: 'Solicitudes', url: '/solicitudes', description: 'Recibe y gestiona emergencias en tiempo real',             color: '#ea580c', bgColor: '#fff7ed' },
@@ -50,12 +61,42 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.authService.currentUser$()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(user => { this.currentUser = user; });
+      .subscribe(user => {
+        this.currentUser = user;
+        if (user?.taller_id) this.cargarStats(user.taller_id);
+      });
 
     this.notifService.startPolling();
     this.notifService.noLeidas$
       .pipe(takeUntil(this.destroy$))
       .subscribe(n => { this.noLeidas = n; });
+  }
+
+  private cargarStats(tallerId: number): void {
+    this.loadingStats = true;
+    forkJoin({
+      historial: this.historialService.cargarResumen(tallerId),
+      ingresos:  this.ingresosService.cargarResumen(tallerId),
+    })
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: ({ historial, ingresos }) => {
+        this.historialResumen = historial;
+        this.ingresosResumen  = ingresos;
+        this.loadingStats = false;
+      },
+      error: () => { this.loadingStats = false; },
+    });
+  }
+
+  formatMoney(val: number | null | undefined): string {
+    if (val == null) return '—';
+    return 'Bs. ' + new Intl.NumberFormat('es-BO', { maximumFractionDigits: 0 }).format(val);
+  }
+
+  formatRating(val: number | null | undefined): string {
+    if (!val) return '—';
+    return val.toFixed(1) + ' ★';
   }
 
   logout(): void {

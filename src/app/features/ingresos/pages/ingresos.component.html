@@ -336,12 +336,119 @@
         </div>
       </div>
 
+      <!-- ── MÉTODO DE PAGO ── -->
+      <div class="metodo-section">
+        <p class="metodo-label">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          Método de pago
+        </p>
+        <div class="metodo-grid">
+          <button type="button" class="metodo-card" [class.metodo-selected]="metodoPagoSeleccionado === 'qr'" (click)="metodoPagoSeleccionado = 'qr'">
+            <div class="metodo-icon-wrap">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="2" height="2"/><rect x="18" y="14" width="2" height="2"/><rect x="14" y="18" width="2" height="2"/><rect x="18" y="18" width="2" height="2"/></svg>
+            </div>
+            <span class="metodo-name">Pago QR</span>
+            <span class="metodo-hint">Escanea el código</span>
+          </button>
+          <button type="button" class="metodo-card" [class.metodo-selected]="metodoPagoSeleccionado === 'transferencia'" (click)="metodoPagoSeleccionado = 'transferencia'">
+            <div class="metodo-icon-wrap">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            </div>
+            <span class="metodo-name">Transferencia</span>
+            <span class="metodo-hint">Datos bancarios</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ── QR ── -->
+      <div *ngIf="metodoPagoSeleccionado === 'qr'" class="pago-instruccion">
+        <p class="instruccion-title">Escanea el código QR para realizar el pago</p>
+        <div class="qr-box">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21 21" class="qr-svg" aria-hidden="true">
+            <rect width="21" height="21" fill="white"/>
+            <!-- TL finder -->
+            <rect x="0" y="0" width="7" height="7" fill="#1e293b"/><rect x="1" y="1" width="5" height="5" fill="white"/><rect x="2" y="2" width="3" height="3" fill="#1e293b"/>
+            <!-- TR finder -->
+            <rect x="14" y="0" width="7" height="7" fill="#1e293b"/><rect x="15" y="1" width="5" height="5" fill="white"/><rect x="16" y="2" width="3" height="3" fill="#1e293b"/>
+            <!-- BL finder -->
+            <rect x="0" y="14" width="7" height="7" fill="#1e293b"/><rect x="1" y="15" width="5" height="5" fill="white"/><rect x="2" y="16" width="3" height="3" fill="#1e293b"/>
+            <!-- Timing row -->
+            <rect x="8" y="6" width="1" height="1" fill="#1e293b"/><rect x="10" y="6" width="1" height="1" fill="#1e293b"/><rect x="12" y="6" width="1" height="1" fill="#1e293b"/>
+            <!-- Timing col -->
+            <rect x="6" y="8" width="1" height="1" fill="#1e293b"/><rect x="6" y="10" width="1" height="1" fill="#1e293b"/><rect x="6" y="12" width="1" height="1" fill="#1e293b"/>
+            <!-- Data center area -->
+            <rect x="8" y="8" width="1" height="1" fill="#1e293b"/><rect x="10" y="8" width="2" height="1" fill="#1e293b"/><rect x="13" y="8" width="1" height="1" fill="#1e293b"/>
+            <rect x="8" y="9" width="1" height="1" fill="#1e293b"/><rect x="11" y="9" width="1" height="1" fill="#1e293b"/>
+            <rect x="9" y="10" width="1" height="1" fill="#1e293b"/><rect x="11" y="10" width="2" height="1" fill="#1e293b"/>
+            <rect x="8" y="11" width="1" height="1" fill="#1e293b"/><rect x="12" y="11" width="2" height="1" fill="#1e293b"/>
+            <rect x="9" y="12" width="2" height="1" fill="#1e293b"/><rect x="13" y="12" width="1" height="1" fill="#1e293b"/>
+            <rect x="8" y="13" width="1" height="1" fill="#1e293b"/><rect x="10" y="13" width="1" height="1" fill="#1e293b"/><rect x="12" y="13" width="2" height="1" fill="#1e293b"/>
+            <!-- Bottom strip -->
+            <rect x="8" y="14" width="2" height="1" fill="#1e293b"/><rect x="11" y="14" width="1" height="1" fill="#1e293b"/><rect x="13" y="14" width="1" height="1" fill="#1e293b"/>
+            <rect x="9" y="15" width="1" height="1" fill="#1e293b"/><rect x="12" y="15" width="2" height="1" fill="#1e293b"/>
+            <rect x="8" y="16" width="1" height="1" fill="#1e293b"/><rect x="11" y="16" width="2" height="1" fill="#1e293b"/>
+            <rect x="9" y="17" width="2" height="1" fill="#1e293b"/><rect x="13" y="17" width="1" height="1" fill="#1e293b"/>
+            <rect x="8" y="18" width="2" height="1" fill="#1e293b"/><rect x="11" y="18" width="1" height="1" fill="#1e293b"/><rect x="13" y="18" width="1" height="1" fill="#1e293b"/>
+            <rect x="9" y="19" width="1" height="1" fill="#1e293b"/><rect x="12" y="19" width="2" height="1" fill="#1e293b"/>
+            <rect x="8" y="20" width="3" height="1" fill="#1e293b"/><rect x="12" y="20" width="2" height="1" fill="#1e293b"/>
+            <!-- Right strip -->
+            <rect x="14" y="8" width="1" height="1" fill="#1e293b"/><rect x="16" y="8" width="2" height="1" fill="#1e293b"/><rect x="20" y="8" width="1" height="1" fill="#1e293b"/>
+            <rect x="15" y="9" width="1" height="1" fill="#1e293b"/><rect x="18" y="9" width="1" height="1" fill="#1e293b"/>
+            <rect x="14" y="10" width="2" height="1" fill="#1e293b"/><rect x="17" y="10" width="1" height="1" fill="#1e293b"/><rect x="19" y="10" width="2" height="1" fill="#1e293b"/>
+            <rect x="15" y="11" width="2" height="1" fill="#1e293b"/><rect x="18" y="11" width="1" height="1" fill="#1e293b"/>
+            <rect x="14" y="12" width="1" height="1" fill="#1e293b"/><rect x="16" y="12" width="1" height="1" fill="#1e293b"/><rect x="19" y="12" width="2" height="1" fill="#1e293b"/>
+            <rect x="15" y="13" width="1" height="1" fill="#1e293b"/><rect x="17" y="13" width="2" height="1" fill="#1e293b"/>
+            <rect x="14" y="14" width="1" height="1" fill="#1e293b"/><rect x="16" y="14" width="2" height="1" fill="#1e293b"/><rect x="20" y="14" width="1" height="1" fill="#1e293b"/>
+            <rect x="15" y="15" width="1" height="1" fill="#1e293b"/><rect x="18" y="15" width="1" height="1" fill="#1e293b"/>
+            <rect x="14" y="16" width="2" height="1" fill="#1e293b"/><rect x="17" y="16" width="1" height="1" fill="#1e293b"/><rect x="19" y="16" width="2" height="1" fill="#1e293b"/>
+            <rect x="16" y="17" width="2" height="1" fill="#1e293b"/><rect x="20" y="17" width="1" height="1" fill="#1e293b"/>
+            <rect x="14" y="18" width="1" height="1" fill="#1e293b"/><rect x="16" y="18" width="1" height="1" fill="#1e293b"/><rect x="18" y="18" width="2" height="1" fill="#1e293b"/>
+            <rect x="15" y="19" width="2" height="1" fill="#1e293b"/><rect x="19" y="19" width="1" height="1" fill="#1e293b"/>
+            <rect x="14" y="20" width="2" height="1" fill="#1e293b"/><rect x="17" y="20" width="1" height="1" fill="#1e293b"/><rect x="19" y="20" width="2" height="1" fill="#1e293b"/>
+          </svg>
+          <p class="qr-monto">{{ formatMoney(pagoSeleccionado.comision_plataforma) }}</p>
+        </div>
+        <p class="instruccion-hint">Una vez realizado el pago, presiona "Confirmar pago"</p>
+      </div>
+
+      <!-- ── TRANSFERENCIA ── -->
+      <div *ngIf="metodoPagoSeleccionado === 'transferencia'" class="pago-instruccion">
+        <p class="instruccion-title">Datos para la transferencia bancaria</p>
+        <div class="bank-card">
+          <div class="bank-row">
+            <span class="bank-lbl">Banco</span>
+            <span class="bank-val">Banco Unión S.A.</span>
+          </div>
+          <div class="bank-row">
+            <span class="bank-lbl">Titular</span>
+            <span class="bank-val">Asistencia Vial S.A.</span>
+          </div>
+          <div class="bank-row">
+            <span class="bank-lbl">N° de cuenta</span>
+            <span class="bank-val fw-700">1000-2345-6789-0</span>
+          </div>
+          <div class="bank-row">
+            <span class="bank-lbl">NIT</span>
+            <span class="bank-val">1234567890</span>
+          </div>
+          <div class="bank-row bank-highlight">
+            <span class="bank-lbl fw-600">Monto a transferir</span>
+            <span class="bank-val fw-700 text-teal">{{ formatMoney(pagoSeleccionado.comision_plataforma) }}</span>
+          </div>
+          <div class="bank-row">
+            <span class="bank-lbl">Referencia</span>
+            <span class="bank-val fw-700">COM-{{ pagoSeleccionado.pago_id }}</span>
+          </div>
+        </div>
+        <p class="instruccion-hint">Incluye la referencia para que el equipo identifique tu pago</p>
+      </div>
+
       <p class="confirm-warning">Esta acción marcará la comisión como pagada. No puede revertirse.</p>
     </div>
 
     <div class="modal-actions">
       <button class="btn-cancel" (click)="cerrarConfirmPago()" [disabled]="procesandoPago">Cancelar</button>
-      <button class="btn-confirm" (click)="confirmarPagoComision()" [disabled]="procesandoPago">
+      <button class="btn-confirm" (click)="confirmarPagoComision()" [disabled]="procesandoPago || !metodoPagoSeleccionado">
         <svg *ngIf="!procesandoPago" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         <svg *ngIf="procesandoPago" class="spinner-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.35)" stroke-width="3" fill="none"/><path d="M12 2a10 10 0 0110 10" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none"/></svg>
         {{ procesandoPago ? 'Procesando…' : 'Confirmar pago' }}

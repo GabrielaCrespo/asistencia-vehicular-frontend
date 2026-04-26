@@ -294,6 +294,174 @@
   border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite;
 }
 
+/* ── MÉTODO DE PAGO ── */
+.metodo-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.metodo-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+}
+
+.metodo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.metodo-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 0.75rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 14px;
+  background: #f8fafc;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: inherit;
+}
+
+.metodo-card:hover {
+  border-color: #5cbdb9;
+  background: #f0fdf9;
+}
+
+.metodo-card.metodo-selected {
+  border-color: #5cbdb9;
+  background: #ebf6f5;
+  box-shadow: 0 0 0 3px rgba(92, 189, 185, 0.15);
+}
+
+.metodo-icon-wrap {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: white;
+  border: 1.5px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  transition: all 0.18s ease;
+}
+
+.metodo-card.metodo-selected .metodo-icon-wrap {
+  background: linear-gradient(135deg, #5cbdb9, #3aa7a2);
+  border-color: transparent;
+  color: white;
+}
+
+.metodo-name {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.metodo-card.metodo-selected .metodo-name { color: #0e6b67; }
+
+.metodo-hint {
+  font-size: 0.72rem;
+  color: #94a3b8;
+}
+
+/* ── INSTRUCCIÓN DE PAGO ── */
+.pago-instruccion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 1.25rem 1rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  text-align: center;
+}
+
+.instruccion-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #334155;
+  margin: 0;
+}
+
+.instruccion-hint {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── QR ── */
+.qr-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.qr-svg {
+  width: 164px;
+  height: 164px;
+  border: 10px solid white;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  display: block;
+  image-rendering: pixelated;
+}
+
+.qr-monto {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #0e6b67;
+  margin: 0;
+  letter-spacing: -0.4px;
+}
+
+/* ── DATOS BANCARIOS ── */
+.bank-card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: white;
+  text-align: left;
+}
+
+.bank-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.55rem 0.875rem;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.82rem;
+}
+
+.bank-row:last-child { border-bottom: none; }
+
+.bank-lbl { color: #94a3b8; font-weight: 500; flex-shrink: 0; }
+.bank-val  { color: #334155; text-align: right; }
+
+.bank-highlight {
+  background: #ebf6f5;
+  border-top: 1px solid rgba(92, 189, 185, 0.2);
+  border-bottom: 1px solid rgba(92, 189, 185, 0.2);
+}
+
 /* ── TOAST ── */
 .toast {
   position: fixed; bottom: 2rem; right: 2rem; z-index: 2000;
@@ -306,6 +474,11 @@
 @keyframes toastIn { from{transform:translateY(12px);opacity:0} to{transform:translateY(0);opacity:1} }
 
 /* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  .toast { left: 1rem; right: 1rem; bottom: 1rem; }
+  .back-btn { font-size: 0; gap: 0; padding: 0.4rem 0.5rem; }
+}
+
 @media (max-width: 768px) {
   .header-inner { padding: 0 1rem; height: 64px; }
   .body-wrap { padding: 0 1rem; }

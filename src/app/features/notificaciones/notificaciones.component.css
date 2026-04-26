@@ -229,4 +229,12 @@
   .notif-title-wrap h1 { font-size: 16px; }
   .btn-mark-all { font-size: 12px; padding: 6px 10px; }
   .notif-item { padding: 13px 14px; }
+  .back-btn { font-size: 0; gap: 0; }
+}
+
+@media (max-width: 480px) {
+  .notif-header-inner { flex-wrap: wrap; gap: 8px; }
+  .notif-header-left { flex: 1; min-width: 0; }
+  .btn-mark-all { width: 100%; text-align: center; }
+  .notif-title-wrap h1 { font-size: 15px; }
 }

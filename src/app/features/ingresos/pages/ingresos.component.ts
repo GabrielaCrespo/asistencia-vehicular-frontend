@@ -36,6 +36,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
   showConfirmPago = false;
   pagoSeleccionado: PagoIngreso | null = null;
   procesandoPago = false;
+  metodoPagoSeleccionado: 'qr' | 'transferencia' | null = null;
 
   // Toast
   toastMsg = '';
@@ -73,6 +74,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
 
   abrirConfirmPago(pago: PagoIngreso) {
     this.pagoSeleccionado = pago;
+    this.metodoPagoSeleccionado = null;
     this.showConfirmPago = true;
   }
 
@@ -80,6 +82,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
     this.showConfirmPago = false;
     this.pagoSeleccionado = null;
     this.procesandoPago = false;
+    this.metodoPagoSeleccionado = null;
   }
 
   confirmarPagoComision() {
