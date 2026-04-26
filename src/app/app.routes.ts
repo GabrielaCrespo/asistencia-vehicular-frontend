@@ -12,6 +12,7 @@ import { authGuard } from './core/guards/auth.guard';
 import { tecnicosRoutes } from './features/tecnicos/tecnicos.routes';
 import { serviciosRoutes } from './features/servicios/servicios.routes';
 import { solicitudesRoutes } from './features/solicitudes/solicitudes.routes';
+import { ingresosRoutes } from './features/ingresos/ingresos.routes';
 
 export const routes: Routes = [
   // LANDING PAGE / BIENVENIDA
@@ -54,6 +55,14 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: solicitudesRoutes,
     data: { title: 'Solicitudes' }
+  },
+
+  // Ruta protegida: Ingresos y Comisiones
+  {
+    path: 'ingresos',
+    canActivate: [authGuard],
+    children: ingresosRoutes,
+    data: { title: 'Ingresos y Comisiones' }
   },
 
   // Ruta protegida: Perfil del Taller

@@ -39,6 +39,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     { label: 'Solicitudes', url: '/solicitudes', description: 'Recibe y gestiona emergencias en tiempo real',        color: '#f97316', bgColor: '#fff7ed' },
     { label: 'Técnicos',   url: '/tecnicos',    description: 'Administra la disponibilidad de tu equipo',           color: '#5cbdb9', bgColor: '#ebf6f5' },
     { label: 'Servicios',  url: '/servicios',   description: 'Configura coberturas y precios de tus servicios',     color: '#3b82f6', bgColor: '#eff6ff' },
+    { label: 'Ingresos',   url: '/ingresos',    description: 'Visualiza ingresos y gestiona comisiones de la plataforma', color: '#16a34a', bgColor: '#f0fdf4' },
     { label: 'Perfil',     url: '/perfil',      description: 'Actualiza la información y horario de tu taller',     color: '#8b5cf6', bgColor: '#f5f3ff' },
   ];
 

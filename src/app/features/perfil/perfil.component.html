@@ -169,12 +169,25 @@
               Ubicación
             </div>
             <div class="card-row">
-              <span class="row-label">Latitud</span>
-              <span class="row-val">{{ profile.latitud }}</span>
+              <span class="row-label">Dirección</span>
+              <span class="row-val">{{ profile.direccion || '—' }}</span>
             </div>
-            <div class="card-row">
-              <span class="row-label">Longitud</span>
-              <span class="row-val">{{ profile.longitud }}</span>
+            <div class="card-row" *ngIf="profile.latitud && profile.latitud !== 0">
+              <span class="row-label">Coordenadas</span>
+              <span class="row-val">{{ profile.latitud | number:'1.4-6' }}, {{ profile.longitud | number:'1.4-6' }}</span>
+            </div>
+            <div class="card-row" *ngIf="profile.latitud && profile.latitud !== 0">
+              <span class="row-label">Ver en mapa</span>
+              <span class="row-val">
+                <a [href]="'https://www.google.com/maps?q=' + profile.latitud + ',' + profile.longitud"
+                   target="_blank" class="map-link">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                  </svg>
+                  Google Maps
+                </a>
+              </span>
             </div>
           </div>
 
@@ -194,8 +207,35 @@
               </div>
               <div class="field">
                 <label>Dirección</label>
-                <input formControlName="direccion" type="text" placeholder="Dirección del taller"
-                  [class.invalid]="f['direccion'].invalid && f['direccion'].touched">
+                <div class="search-wrap">
+                  <input
+                    type="text"
+                    [value]="form.get('direccion')?.value"
+                    (input)="onDireccionInput($event)"
+                    (blur)="hideSuggestions()"
+                    placeholder="Escribe la dirección o haz clic en el mapa"
+                    [class.invalid]="f['direccion'].invalid && f['direccion'].touched"
+                    autocomplete="off"
+                  />
+                  <span *ngIf="searchLoading" class="search-spinner"></span>
+
+                  <!-- Sugerencias Nominatim -->
+                  <div *ngIf="showSuggestions && searchResults.length > 0" class="suggestions-list">
+                    <button
+                      type="button"
+                      class="suggestion-item"
+                      *ngFor="let r of searchResults"
+                      (mousedown)="selectSuggestion(r)"
+                    >
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                      </svg>
+                      {{ r.display_name }}
+                    </button>
+                  </div>
+                </div>
+
                 <span class="field-error" *ngIf="f['direccion'].invalid && f['direccion'].touched">Campo requerido</span>
               </div>
             </div>
@@ -221,6 +261,26 @@
                   [class.invalid]="f['horario_fin'].invalid && f['horario_fin'].touched">
                 <span class="field-error" *ngIf="f['horario_fin'].hasError('required') && f['horario_fin'].touched">Requerido</span>
                 <span class="field-error" *ngIf="f['horario_fin'].hasError('pattern') && f['horario_fin'].touched">Formato inválido. Use HH:MM (ej: 08:00, 23:59)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3 class="section-title">Ubicación del Taller</h3>
+            <div class="form-row">
+              <div class="field full-width">
+                <label>
+                  Posición en el mapa
+                  <span class="field-hint">Haz clic en el mapa, arrastra el marcador o busca la dirección arriba</span>
+                </label>
+                <div #mapContainer class="map-container"></div>
+                <div *ngIf="selectedLat !== null" class="coords-display">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                    <circle cx="12" cy="10" r="3"/>
+                  </svg>
+                  {{ selectedLat }}, {{ selectedLng }}
+                </div>
               </div>
             </div>
           </div>

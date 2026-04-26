@@ -77,9 +77,75 @@
       <!-- ── TAB: DISPONIBLES ── -->
       <ng-container *ngIf="activeTab === 'disponibles'">
         <ng-container *ngIf="disponibles$ | async as lista">
+          <ng-container *ngIf="filtrarDisponibles(lista) as filtradas">
           <div class="panel-header-row">
             <h3>Solicitudes disponibles</h3>
-            <span class="panel-tag">{{ lista.length }} pendiente{{ lista.length !== 1 ? 's' : '' }}</span>
+            <span class="panel-tag">
+              {{ filtradas.length }}<ng-container *ngIf="filtradas.length !== lista.length"> / {{ lista.length }}</ng-container>
+              pendiente{{ filtradas.length !== 1 ? 's' : '' }}
+            </span>
+          </div>
+
+          <div *ngIf="lista.length > 0" class="fbar">
+            <div class="fbar-head">
+              <div class="fbar-title">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                </svg>
+                Filtros
+                <span *ngIf="contarFiltrosActivos() > 0" class="fbar-badge">{{ contarFiltrosActivos() }}</span>
+              </div>
+              <button *ngIf="hayFiltrosActivos()" class="fbar-clear" (click)="limpiarFiltros()">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+                Limpiar
+              </button>
+            </div>
+            <div class="fbar-body">
+              <div class="fbar-group">
+                <span class="fbar-label">Prioridad</span>
+                <div class="fbar-chips">
+                  <button class="fbar-chip chip-alta" [class.chip-on]="filtroPrioridades['alta']" (click)="toggleFiltroPrioridad('alta')">Alta</button>
+                  <button class="fbar-chip chip-normal" [class.chip-on]="filtroPrioridades['normal']" (click)="toggleFiltroPrioridad('normal')">Normal</button>
+                  <button class="fbar-chip chip-baja" [class.chip-on]="filtroPrioridades['baja']" (click)="toggleFiltroPrioridad('baja')">Baja</button>
+                </div>
+              </div>
+              <div class="fbar-group">
+                <span class="fbar-label">Distancia</span>
+                <div class="fbar-chips">
+                  <button class="fbar-chip chip-dist" [class.chip-on]="filtroDistanciaMax === 5" (click)="setFiltroDistancia(5)">≤ 5 km</button>
+                  <button class="fbar-chip chip-dist" [class.chip-on]="filtroDistanciaMax === 10" (click)="setFiltroDistancia(10)">≤ 10 km</button>
+                  <button class="fbar-chip chip-dist" [class.chip-on]="filtroDistanciaMax === 20" (click)="setFiltroDistancia(20)">≤ 20 km</button>
+                  <button class="fbar-chip chip-dist" [class.chip-on]="filtroDistanciaMax === 50" (click)="setFiltroDistancia(50)">≤ 50 km</button>
+                </div>
+              </div>
+              <div class="fbar-group">
+                <span class="fbar-label">Fecha</span>
+                <div class="fbar-dates">
+                  <input type="date" class="fbar-date" [(ngModel)]="filtroFechaDesde" />
+                  <span class="fbar-date-sep">—</span>
+                  <input type="date" class="fbar-date" [(ngModel)]="filtroFechaHasta" />
+                </div>
+              </div>
+              <div class="fbar-group">
+                <span class="fbar-label">Orden</span>
+                <div class="fbar-chips">
+                  <button class="fbar-chip chip-sort" [class.chip-on]="ordenFecha === 'desc'" (click)="setOrdenFecha('desc')">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>
+                    </svg>
+                    Recientes
+                  </button>
+                  <button class="fbar-chip chip-sort" [class.chip-on]="ordenFecha === 'asc'" (click)="setOrdenFecha('asc')">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
+                    </svg>
+                    Antiguos
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div *ngIf="!hayTecnicosDisponibles" class="alert alert-warn">
@@ -90,8 +156,8 @@
             No tienes técnicos disponibles. Activa al menos uno en <a routerLink="/tecnicos" class="alert-link">Técnicos</a> para poder aceptar solicitudes.
           </div>
 
-          <div *ngIf="lista.length > 0; else sinDisponibles" class="cards-grid">
-            <div class="solicitud-card" *ngFor="let s of lista" [class.urgente]="s.prioridad === 'urgente'">
+          <div *ngIf="filtradas.length > 0; else sinFiltrados" class="cards-grid">
+            <div class="solicitud-card" *ngFor="let s of filtradas" [class.alta]="s.prioridad === 'alta' || s.prioridad === 'urgente'">
               <div class="card-top">
                 <div class="card-vehicle">
                   <div class="vehicle-avatar">
@@ -106,9 +172,7 @@
                   </div>
                 </div>
                 <div class="card-badges">
-                  <span class="badge" [ngClass]="prioridadClass(s.prioridad)">
-                    {{ s.prioridad === 'urgente' ? '⚡ Urgente' : 'Normal' }}
-                  </span>
+                  <span class="badge" [ngClass]="prioridadClass(s.prioridad)">{{ prioridadLabel(s.prioridad) }}</span>
                   <span *ngIf="s.distancia_km != null" class="badge badge-dist">
                     {{ s.distancia_km | number:'1.1-1' }} km
                   </span>
@@ -140,19 +204,19 @@
               </div>
 
               <div class="card-evidencias">
-                <span *ngIf="s.imagen_path" class="ev-badge">
+                <span class="ev-badge" [class.ev-badge-off]="!s.imagen_path">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
                     <polyline points="21 15 16 10 5 21"/>
                   </svg>
-                  Imagen
+                  {{ s.imagen_path ? 'Imagen' : 'Sin imagen' }}
                 </span>
-                <span *ngIf="s.audio_path" class="ev-badge">
+                <span class="ev-badge" [class.ev-badge-off]="!s.audio_path">
                   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
                     <path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/>
                   </svg>
-                  Audio
+                  {{ s.audio_path ? 'Audio' : 'Sin audio' }}
                 </span>
               </div>
 
@@ -193,30 +257,102 @@
             </div>
           </div>
 
-          <ng-template #sinDisponibles>
-            <div class="empty-state">
-              <div class="empty-icon">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
-                </svg>
+          <ng-template #sinFiltrados>
+            <ng-container *ngIf="lista.length === 0; else filtroSinResultados">
+              <div class="empty-state">
+                <div class="empty-icon">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+                  </svg>
+                </div>
+                <p class="empty-title">Sin solicitudes disponibles</p>
+                <p class="empty-desc">No hay incidentes pendientes en este momento</p>
               </div>
-              <p class="empty-title">Sin solicitudes disponibles</p>
-              <p class="empty-desc">No hay incidentes pendientes en este momento</p>
-            </div>
+            </ng-container>
+            <ng-template #filtroSinResultados>
+              <div class="empty-state">
+                <div class="empty-icon">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                  </svg>
+                </div>
+                <p class="empty-title">Sin resultados</p>
+                <p class="empty-desc">Ninguna solicitud coincide con los filtros activos</p>
+                <button class="btn-limpiar btn-limpiar-empty" (click)="limpiarFiltros()">Limpiar filtros</button>
+              </div>
+            </ng-template>
           </ng-template>
+          </ng-container>
         </ng-container>
       </ng-container>
 
       <!-- ── TAB: ASIGNADAS ── -->
       <ng-container *ngIf="activeTab === 'asignadas'">
         <ng-container *ngIf="asignadas$ | async as lista">
+          <ng-container *ngIf="filtrarAsignadas(lista) as filtradas">
           <div class="panel-header-row">
             <h3>Solicitudes activas</h3>
-            <span class="panel-tag">{{ lista.length }} activa{{ lista.length !== 1 ? 's' : '' }}</span>
+            <span class="panel-tag">
+              {{ filtradas.length }}<ng-container *ngIf="filtradas.length !== lista.length"> / {{ lista.length }}</ng-container>
+              activa{{ filtradas.length !== 1 ? 's' : '' }}
+            </span>
           </div>
 
-          <div *ngIf="lista.length > 0; else sinAsignadas" class="asignadas-grid">
-            <div class="asignada-card" [ngClass]="'card-est-' + a.estado" *ngFor="let a of lista">
+          <div *ngIf="lista.length > 0" class="fbar">
+            <div class="fbar-head">
+              <div class="fbar-title">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                </svg>
+                Filtros
+                <span *ngIf="contarFiltrosActivos() > 0" class="fbar-badge">{{ contarFiltrosActivos() }}</span>
+              </div>
+              <button *ngIf="hayFiltrosActivos()" class="fbar-clear" (click)="limpiarFiltros()">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+                Limpiar
+              </button>
+            </div>
+            <div class="fbar-body">
+              <div class="fbar-group">
+                <span class="fbar-label">Prioridad</span>
+                <div class="fbar-chips">
+                  <button class="fbar-chip chip-alta" [class.chip-on]="filtroPrioridades['alta']" (click)="toggleFiltroPrioridad('alta')">Alta</button>
+                  <button class="fbar-chip chip-normal" [class.chip-on]="filtroPrioridades['normal']" (click)="toggleFiltroPrioridad('normal')">Normal</button>
+                  <button class="fbar-chip chip-baja" [class.chip-on]="filtroPrioridades['baja']" (click)="toggleFiltroPrioridad('baja')">Baja</button>
+                </div>
+              </div>
+              <div class="fbar-group">
+                <span class="fbar-label">Fecha asignación</span>
+                <div class="fbar-dates">
+                  <input type="date" class="fbar-date" [(ngModel)]="filtroFechaDesde" />
+                  <span class="fbar-date-sep">—</span>
+                  <input type="date" class="fbar-date" [(ngModel)]="filtroFechaHasta" />
+                </div>
+              </div>
+              <div class="fbar-group">
+                <span class="fbar-label">Orden</span>
+                <div class="fbar-chips">
+                  <button class="fbar-chip chip-sort" [class.chip-on]="ordenFecha === 'desc'" (click)="setOrdenFecha('desc')">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>
+                    </svg>
+                    Recientes
+                  </button>
+                  <button class="fbar-chip chip-sort" [class.chip-on]="ordenFecha === 'asc'" (click)="setOrdenFecha('asc')">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
+                    </svg>
+                    Antiguos
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="filtradas.length > 0; else sinFiltrados2" class="asignadas-grid">
+            <div class="asignada-card" [ngClass]="'card-est-' + a.estado" *ngFor="let a of filtradas">
 
               <!-- Cabecera -->
               <div class="acard-header">
@@ -234,9 +370,7 @@
                 </div>
                 <div class="card-badges">
                   <span class="badge" [ngClass]="estadoBadgeClass(a.estado)">{{ etiquetaEstadoDisplay(a.estado) }}</span>
-                  <span class="badge" [ngClass]="prioridadClass(a.prioridad)">
-                    {{ a.prioridad === 'urgente' ? '⚡ Urgente' : 'Normal' }}
-                  </span>
+                  <span class="badge" [ngClass]="prioridadClass(a.prioridad)">{{ prioridadLabel(a.prioridad) }}</span>
                 </div>
               </div>
 
@@ -361,29 +495,102 @@
             </div>
           </div>
 
-          <ng-template #sinAsignadas>
-            <div class="empty-state">
-              <div class="empty-icon">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
-                  <rect x="9" y="3" width="6" height="4" rx="1"/>
-                </svg>
+          <ng-template #sinFiltrados2>
+            <ng-container *ngIf="lista.length === 0; else filtroSinResultados2">
+              <div class="empty-state">
+                <div class="empty-icon">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+                    <rect x="9" y="3" width="6" height="4" rx="1"/>
+                  </svg>
+                </div>
+                <p class="empty-title">Sin solicitudes activas</p>
+                <p class="empty-desc">No tienes incidentes en curso en este momento</p>
               </div>
-              <p class="empty-title">Sin solicitudes activas</p>
-              <p class="empty-desc">No tienes incidentes en curso en este momento</p>
-            </div>
+            </ng-container>
+            <ng-template #filtroSinResultados2>
+              <div class="empty-state">
+                <div class="empty-icon">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                  </svg>
+                </div>
+                <p class="empty-title">Sin resultados</p>
+                <p class="empty-desc">Ninguna solicitud activa coincide con los filtros</p>
+                <button class="btn-limpiar btn-limpiar-empty" (click)="limpiarFiltros()">Limpiar filtros</button>
+              </div>
+            </ng-template>
           </ng-template>
+          </ng-container>
         </ng-container>
       </ng-container>
 
       <!-- ── TAB: HISTORIAL ── -->
       <ng-container *ngIf="activeTab === 'historial'">
         <ng-container *ngIf="historial$ | async as lista">
+          <ng-container *ngIf="filtrarAsignadas(lista) as filtradas">
           <div class="panel-header-row">
             <h3>Historial de solicitudes</h3>
-            <span class="panel-tag">{{ lista.length }} registro{{ lista.length !== 1 ? 's' : '' }}</span>
+            <span class="panel-tag">
+              {{ filtradas.length }}<ng-container *ngIf="filtradas.length !== lista.length"> / {{ lista.length }}</ng-container>
+              registro{{ filtradas.length !== 1 ? 's' : '' }}
+            </span>
           </div>
-          <div class="panel" *ngIf="lista.length > 0; else sinHistorial">
+
+          <div *ngIf="lista.length > 0" class="fbar">
+            <div class="fbar-head">
+              <div class="fbar-title">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                </svg>
+                Filtros
+                <span *ngIf="contarFiltrosActivos() > 0" class="fbar-badge">{{ contarFiltrosActivos() }}</span>
+              </div>
+              <button *ngIf="hayFiltrosActivos()" class="fbar-clear" (click)="limpiarFiltros()">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+                Limpiar
+              </button>
+            </div>
+            <div class="fbar-body">
+              <div class="fbar-group">
+                <span class="fbar-label">Prioridad</span>
+                <div class="fbar-chips">
+                  <button class="fbar-chip chip-alta" [class.chip-on]="filtroPrioridades['alta']" (click)="toggleFiltroPrioridad('alta')">Alta</button>
+                  <button class="fbar-chip chip-normal" [class.chip-on]="filtroPrioridades['normal']" (click)="toggleFiltroPrioridad('normal')">Normal</button>
+                  <button class="fbar-chip chip-baja" [class.chip-on]="filtroPrioridades['baja']" (click)="toggleFiltroPrioridad('baja')">Baja</button>
+                </div>
+              </div>
+              <div class="fbar-group">
+                <span class="fbar-label">Fecha</span>
+                <div class="fbar-dates">
+                  <input type="date" class="fbar-date" [(ngModel)]="filtroFechaDesde" />
+                  <span class="fbar-date-sep">—</span>
+                  <input type="date" class="fbar-date" [(ngModel)]="filtroFechaHasta" />
+                </div>
+              </div>
+              <div class="fbar-group">
+                <span class="fbar-label">Orden</span>
+                <div class="fbar-chips">
+                  <button class="fbar-chip chip-sort" [class.chip-on]="ordenFecha === 'desc'" (click)="setOrdenFecha('desc')">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>
+                    </svg>
+                    Recientes
+                  </button>
+                  <button class="fbar-chip chip-sort" [class.chip-on]="ordenFecha === 'asc'" (click)="setOrdenFecha('asc')">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
+                    </svg>
+                    Antiguos
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel" *ngIf="filtradas.length > 0; else sinFiltrados3">
             <div class="table-wrap">
               <table class="table">
                 <thead>
@@ -399,7 +606,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let a of lista">
+                  <tr *ngFor="let a of filtradas">
                     <td class="text-secondary">{{ a.asignacion_id }}</td>
                     <td>
                       <div class="cell-stacked">
@@ -409,7 +616,7 @@
                     </td>
                     <td class="desc-cell">{{ a.descripcion }}</td>
                     <td>
-                      <span class="badge" [ngClass]="prioridadClass(a.prioridad)">{{ a.prioridad }}</span>
+                      <span class="badge" [ngClass]="prioridadClass(a.prioridad)">{{ prioridadLabel(a.prioridad) }}</span>
                     </td>
                     <td>
                       <span class="badge" [ngClass]="estadoBadgeClass(a.estado)">{{ a.estado }}</span>
@@ -428,17 +635,32 @@
               </table>
             </div>
           </div>
-          <ng-template #sinHistorial>
-            <div class="empty-state">
-              <div class="empty-icon">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <polyline points="12 8 12 12 14 14"/><circle cx="12" cy="12" r="10"/>
-                </svg>
+          <ng-template #sinFiltrados3>
+            <ng-container *ngIf="lista.length === 0; else filtroSinResultados3">
+              <div class="empty-state">
+                <div class="empty-icon">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <polyline points="12 8 12 12 14 14"/><circle cx="12" cy="12" r="10"/>
+                  </svg>
+                </div>
+                <p class="empty-title">Sin historial</p>
+                <p class="empty-desc">Aún no tienes solicitudes registradas</p>
               </div>
-              <p class="empty-title">Sin historial</p>
-              <p class="empty-desc">Aún no tienes solicitudes registradas</p>
-            </div>
+            </ng-container>
+            <ng-template #filtroSinResultados3>
+              <div class="empty-state">
+                <div class="empty-icon">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                  </svg>
+                </div>
+                <p class="empty-title">Sin resultados</p>
+                <p class="empty-desc">Ningún registro coincide con los filtros activos</p>
+                <button class="btn-limpiar btn-limpiar-empty" (click)="limpiarFiltros()">Limpiar filtros</button>
+              </div>
+            </ng-template>
           </ng-template>
+          </ng-container>
         </ng-container>
       </ng-container>
 
@@ -480,9 +702,7 @@
         <!-- ── CABECERA: estado + prioridad ── -->
         <div class="detalle-badges">
           <span class="badge badge-lg" [ngClass]="estadoBadgeClass(detalle.estado)">{{ detalle.estado }}</span>
-          <span class="badge badge-lg" [ngClass]="prioridadClass(detalle.prioridad)">
-            {{ detalle.prioridad === 'urgente' ? '⚡ Urgente' : 'Normal' }}
-          </span>
+          <span class="badge badge-lg" [ngClass]="prioridadClass(detalle.prioridad)">{{ prioridadLabel(detalle.prioridad) }}</span>
           <span *ngIf="detalle.tipo_problema" class="badge badge-lg badge-tipo">{{ detalle.tipo_problema }}</span>
           <span class="text-secondary text-sm ml-auto">{{ detalle.fecha_creacion | date:'dd/MM/yyyy HH:mm' }}</span>
         </div>
@@ -542,6 +762,9 @@
                    class="preview-img"
                    (error)="onImgError($event)" />
               <p class="sin-evidencia img-fallback" style="display:none">No se pudo cargar la imagen</p>
+              <a [href]="imagenUrl(detalle.imagen_path!)" target="_blank" rel="noopener" class="img-link">
+                Ver imagen completa
+              </a>
             </div>
           </ng-container>
           <ng-template #sinImagen>
@@ -560,11 +783,12 @@
           </div>
           <ng-container *ngIf="detalle.audio_path || detalle.ia_analisis?.transcripcion_audio; else sinAudio">
             <div *ngIf="detalle.audio_path" class="audio-file">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-              </svg>
-              <code class="ev-path">{{ detalle.audio_path }}</code>
+              <audio controls [src]="audioUrl(detalle.audio_path!)" class="audio-player">
+                Tu navegador no soporta la reproducción de audio.
+              </audio>
+              <a [href]="audioUrl(detalle.audio_path!)" target="_blank" rel="noopener" class="img-link">
+                Descargar audio
+              </a>
             </div>
             <div *ngIf="detalle.ia_analisis?.transcripcion_audio" class="transcripcion-box">
               <div class="transcripcion-label">Transcripción automática</div>

@@ -51,7 +51,7 @@ html.dark-theme .dash-page {
 }
 
 .nav-brand span {
-  font-size: 1.05rem;
+  font-size: 1.15rem;
   font-weight: 700;
   letter-spacing: -0.3px;
   white-space: nowrap;
@@ -85,7 +85,7 @@ html.dark-theme .dash-page {
 }
 
 .user-name {
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 600;
   color: rgba(255,255,255,0.9);
   white-space: nowrap;
@@ -95,12 +95,12 @@ html.dark-theme .dash-page {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.45rem 1rem;
+  padding: 0.5rem 1.1rem;
   border: 1.5px solid rgba(255,255,255,0.35);
   border-radius: 8px;
   background: rgba(255,255,255,0.12);
   color: rgba(255,255,255,0.9);
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.22s ease;
@@ -150,7 +150,7 @@ html.dark-theme .welcome-banner {
 }
 
 .welcome-label {
-  font-size: 0.75rem;
+  font-size: 0.9rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -159,7 +159,7 @@ html.dark-theme .welcome-banner {
 }
 
 .welcome-banner h1 {
-  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-size: clamp(1.8rem, 3.5vw, 2.4rem);
   font-weight: 800;
   letter-spacing: -0.5px;
   color: var(--txt, #0f172a);
@@ -177,7 +177,7 @@ html.dark-theme .welcome-banner h1 { color: var(--txt, #f1f5f9); }
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.88rem;
+  font-size: 1rem;
   color: var(--txt2, #475569);
 }
 
@@ -187,12 +187,12 @@ html.dark-theme .welcome-taller { color: var(--txt2, #94a3b8); }
   display: inline-flex;
   align-items: center;
   gap: 0.6rem;
-  padding: 0.6rem 1.1rem;
+  padding: 0.65rem 1.2rem;
   background: #ebf6f5;
   border: 1.5px solid rgba(92,189,185,0.3);
   border-radius: 100px;
   color: #3aa7a2;
-  font-size: 0.82rem;
+  font-size: 0.95rem;
   font-weight: 700;
   white-space: nowrap;
   flex-shrink: 0;
@@ -249,7 +249,7 @@ html.dark-theme .stat-card {
 .stat-icon svg { width: 22px; height: 22px; }
 
 .stat-label {
-  font-size: 0.78rem;
+  font-size: 0.95rem;
   color: var(--txt2, #475569);
   margin-bottom: 0.2rem;
   font-weight: 500;
@@ -258,7 +258,7 @@ html.dark-theme .stat-card {
 html.dark-theme .stat-label { color: var(--txt2, #94a3b8); }
 
 .stat-val {
-  font-size: 1.4rem;
+  font-size: 1.65rem;
   font-weight: 800;
   color: var(--txt, #0f172a);
   letter-spacing: -0.5px;
@@ -296,7 +296,7 @@ html.dark-theme .panel {
 }
 
 .panel-header h3 {
-  font-size: 1rem;
+  font-size: 1.15rem;
   font-weight: 700;
   letter-spacing: -0.3px;
   color: var(--txt, #0f172a);
@@ -305,14 +305,14 @@ html.dark-theme .panel {
 html.dark-theme .panel-header h3 { color: var(--txt, #f1f5f9); }
 
 .panel-tag {
-  font-size: 0.7rem;
+  font-size: 0.85rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: #5cbdb9;
   background: #ebf6f5;
   border: 1px solid rgba(92,189,185,0.25);
-  padding: 0.2rem 0.6rem;
+  padding: 0.25rem 0.7rem;
   border-radius: 100px;
 }
 
@@ -358,7 +358,7 @@ html.dark-theme .feature-item { border-color: var(--border, #334155); }
 .feat-icon-sm svg { width: 18px; height: 18px; }
 
 .feat-name {
-  font-size: 0.88rem;
+  font-size: 0.95rem;
   font-weight: 600;
   color: var(--txt, #0f172a);
   margin-bottom: 0.15rem;
@@ -367,7 +367,7 @@ html.dark-theme .feature-item { border-color: var(--border, #334155); }
 html.dark-theme .feat-name { color: var(--txt, #f1f5f9); }
 
 .feat-desc {
-  font-size: 0.78rem;
+  font-size: 0.875rem;
   color: var(--txt2, #475569);
   line-height: 1.5;
 }
@@ -402,7 +402,7 @@ html.dark-theme .info-row { border-color: var(--border, #334155); }
 }
 
 .info-label {
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -411,7 +411,7 @@ html.dark-theme .info-row { border-color: var(--border, #334155); }
 }
 
 .info-val {
-  font-size: 0.88rem;
+  font-size: 0.95rem;
   font-weight: 500;
   color: var(--txt, #0f172a);
 }
@@ -433,7 +433,7 @@ html.dark-theme .system-status {
 }
 
 .status-header {
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -446,7 +446,7 @@ html.dark-theme .system-status {
   align-items: center;
   gap: 0.6rem;
   padding: 0.45rem 0;
-  font-size: 0.82rem;
+  font-size: 0.9rem;
   color: var(--txt2, #475569);
 }
 
@@ -464,7 +464,7 @@ html.dark-theme .status-row { color: var(--txt2, #94a3b8); }
 
 .status-pill {
   margin-left: auto;
-  font-size: 0.7rem;
+  font-size: 0.78rem;
   font-weight: 700;
   padding: 0.15rem 0.55rem;
   border-radius: 100px;
@@ -504,12 +504,17 @@ html.dark-theme .status-pill.warn {
 .nav-card {
   background: var(--card-bg, #ebf6f5);
   border: 1.5px solid color-mix(in srgb, var(--card-color, #5cbdb9) 20%, transparent);
-  border-radius: 12px;
-  padding: 0.85rem 1rem;
+  border-radius: 16px;
+  padding: 1.75rem 1rem 2.25rem;
   cursor: pointer;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
+  justify-content: center;
+  text-align: center;
+  gap: 0.85rem;
+  aspect-ratio: 1;
+  position: relative;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   box-shadow: 0 1px 3px rgba(0,0,0,.04);
   user-select: none;
@@ -528,10 +533,10 @@ html.dark-theme .nav-card {
 }
 
 .nav-card-icon {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
-  border-radius: 9px;
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  border-radius: 14px;
   background: color-mix(in srgb, var(--card-color, #5cbdb9) 18%, white);
   color: var(--card-color, #5cbdb9);
   display: flex;
@@ -540,22 +545,22 @@ html.dark-theme .nav-card {
   flex-shrink: 0;
 }
 
-.nav-card-icon svg { width: 17px; height: 17px; }
+.nav-card-icon svg { width: 26px; height: 26px; }
 
-.nav-card-body { flex: 1; min-width: 0; }
+.nav-card-body { flex: none; }
 
 .nav-card-body h4 {
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: 700;
   color: #0f172a;
-  margin: 0 0 0.1rem 0;
+  margin: 0 0 0.25rem 0;
   letter-spacing: -0.15px;
 }
 
 html.dark-theme .nav-card-body h4 { color: #f1f5f9; }
 
 .nav-card-body p {
-  font-size: 0.72rem;
+  font-size: 0.82rem;
   color: #64748b;
   margin: 0;
   line-height: 1.4;
@@ -564,13 +569,15 @@ html.dark-theme .nav-card-body h4 { color: #f1f5f9; }
 html.dark-theme .nav-card-body p { color: #94a3b8; }
 
 .nav-card-arrow {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 0.85rem;
   color: var(--card-color, #5cbdb9);
-  opacity: 0.5;
-  flex-shrink: 0;
+  opacity: 0.45;
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-.nav-card-arrow svg { width: 15px; height: 15px; }
+.nav-card-arrow svg { width: 14px; height: 14px; }
 
 .nav-card:hover .nav-card-arrow {
   transform: translateX(3px);

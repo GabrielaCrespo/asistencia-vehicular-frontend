@@ -33,6 +33,7 @@ html {
   --ease: cubic-bezier(.4,0,.2,1);
   --t: .22s var(--ease);
 
+  font-size: 18px;
   font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   scroll-behavior: smooth;
 }
@@ -57,7 +58,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
   transition: background var(--t), color var(--t);
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
 /* ── Scrollbar ── */

@@ -79,6 +79,88 @@ export class SolicitudesComponent implements OnInit, OnDestroy {
 
   hayTecnicosDisponibles = true;
 
+  // ── Filtros ──────────────────────────────────────────────────
+  filtroPrioridades: Record<string, boolean> = {};
+  filtroDistanciaMax: number | null = null;
+  filtroFechaDesde = '';
+  filtroFechaHasta = '';
+  ordenFecha: 'asc' | 'desc' = 'desc';
+
+  toggleFiltroPrioridad(p: string): void {
+    this.filtroPrioridades = { ...this.filtroPrioridades, [p]: !this.filtroPrioridades[p] };
+  }
+
+  setFiltroDistancia(km: number): void {
+    this.filtroDistanciaMax = this.filtroDistanciaMax === km ? null : km;
+  }
+
+  setOrdenFecha(orden: 'asc' | 'desc'): void {
+    this.ordenFecha = orden;
+  }
+
+  hayFiltrosActivos(): boolean {
+    return Object.values(this.filtroPrioridades).some(Boolean)
+      || this.filtroDistanciaMax !== null
+      || !!this.filtroFechaDesde
+      || !!this.filtroFechaHasta;
+  }
+
+  limpiarFiltros(): void {
+    this.filtroPrioridades = {};
+    this.filtroDistanciaMax = null;
+    this.filtroFechaDesde = '';
+    this.filtroFechaHasta = '';
+  }
+
+  private normalizarPrioridad(p: string): string {
+    return p === 'urgente' ? 'alta' : p;
+  }
+
+  private fechaStr(ts: string): string {
+    if (!ts) return '';
+    // El backend devuelve el timestamp en UTC. Convertimos a timezone local del browser
+    // para que la comparación coincida con lo que muestra el pipe date de Angular.
+    const d = new Date(ts.replace(' ', 'T'));
+    if (isNaN(d.getTime())) return ts.substring(0, 10);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  filtrarDisponibles(lista: SolicitudDisponible[]): SolicitudDisponible[] {
+    const prioActivas = Object.entries(this.filtroPrioridades).filter(([, v]) => v).map(([k]) => k);
+    const filtered = lista.filter(s => {
+      if (prioActivas.length > 0 && !prioActivas.includes(this.normalizarPrioridad(s.prioridad))) return false;
+      // Distancia: solo filtra si el incidente tiene distancia calculada
+      if (this.filtroDistanciaMax !== null && s.distancia_km != null && +s.distancia_km > this.filtroDistanciaMax) return false;
+      // Fechas: comparación de strings YYYY-MM-DD para evitar desfases de zona horaria
+      const fecha = this.fechaStr(s.fecha_creacion);
+      if (this.filtroFechaDesde && fecha < this.filtroFechaDesde) return false;
+      if (this.filtroFechaHasta && fecha > this.filtroFechaHasta) return false;
+      return true;
+    });
+    return filtered.sort((a, b) => {
+      const diff = this.fechaStr(a.fecha_creacion).localeCompare(this.fechaStr(b.fecha_creacion));
+      return this.ordenFecha === 'desc' ? -diff : diff;
+    });
+  }
+
+  filtrarAsignadas(lista: SolicitudAsignada[]): SolicitudAsignada[] {
+    const prioActivas = Object.entries(this.filtroPrioridades).filter(([, v]) => v).map(([k]) => k);
+    const filtered = lista.filter(a => {
+      if (prioActivas.length > 0 && !prioActivas.includes(this.normalizarPrioridad(a.prioridad))) return false;
+      const fecha = this.fechaStr(a.fecha_asignacion);
+      if (this.filtroFechaDesde && fecha < this.filtroFechaDesde) return false;
+      if (this.filtroFechaHasta && fecha > this.filtroFechaHasta) return false;
+      return true;
+    });
+    return filtered.sort((a, b) => {
+      const diff = this.fechaStr(a.fecha_asignacion).localeCompare(this.fechaStr(b.fecha_asignacion));
+      return this.ordenFecha === 'desc' ? -diff : diff;
+    });
+  }
+
   ngOnInit() {
     this.authService.auth$
       .pipe(takeUntil(this.destroy$))
@@ -210,6 +292,13 @@ export class SolicitudesComponent implements OnInit, OnDestroy {
     return `${environment.api.baseUrl}/imagenes/${filename}`;
   }
 
+  audioUrl(path: string): string {
+    if (path.includes('cloudinary.com') && path.includes('/video/upload/')) {
+      return path.replace('/video/upload/', '/video/upload/f_mp3/');
+    }
+    return path;
+  }
+
   onImgError(event: Event) {
     const img = event.target as HTMLImageElement;
     img.style.display = 'none';
@@ -232,7 +321,29 @@ export class SolicitudesComponent implements OnInit, OnDestroy {
   }
 
   prioridadClass(prioridad: string): string {
-    return prioridad === 'urgente' ? 'badge-urgente' : 'badge-normal';
+    const map: Record<string, string> = {
+      alta: 'badge-alta', urgente: 'badge-alta',
+      normal: 'badge-normal',
+      baja: 'badge-baja',
+    };
+    return map[prioridad] ?? 'badge-normal';
+  }
+
+  prioridadLabel(prioridad: string): string {
+    const map: Record<string, string> = {
+      alta: 'Alta', urgente: 'Alta',
+      normal: 'Normal',
+      baja: 'Baja',
+    };
+    return map[prioridad] ?? prioridad;
+  }
+
+  contarFiltrosActivos(): number {
+    let n = 0;
+    if (Object.values(this.filtroPrioridades).some(Boolean)) n++;
+    if (this.filtroDistanciaMax !== null) n++;
+    if (this.filtroFechaDesde || this.filtroFechaHasta) n++;
+    return n;
   }
 
   // ── Asignar técnico ──────────────────────────────────────────────────
