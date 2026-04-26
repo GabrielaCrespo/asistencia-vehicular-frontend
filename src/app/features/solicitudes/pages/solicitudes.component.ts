@@ -72,6 +72,9 @@ export class SolicitudesComponent implements OnInit, OnDestroy {
   diagnosticoCosto: number | null = null;
   diagnosticoMetodoPago = '';
 
+  // IA
+  analizandoIA = false;
+
   // Feedback toast
   toastMsg = '';
   toastType: 'ok' | 'err' = 'ok';
@@ -500,6 +503,27 @@ export class SolicitudesComponent implements OnInit, OnDestroy {
     } else if (a.estado === 'en_servicio') {
       this.abrirDiagnostico(a);
     }
+  }
+
+  analizarIA(incidenteId: number) {
+    this.analizandoIA = true;
+    this.solicitudesService
+      .analizarConIA(incidenteId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.analizandoIA = false;
+          this.mostrarToast('Análisis de IA completado', 'ok');
+          // Recargar detalle para mostrar el análisis y la nueva prioridad
+          this.abrirDetalle(incidenteId);
+          // Refrescar la lista para que la tarjeta muestre la prioridad actualizada
+          this.cargarTab(this.activeTab);
+        },
+        error: (e) => {
+          this.analizandoIA = false;
+          this.mostrarToast(e.message || 'Error en análisis de IA', 'err');
+        },
+      });
   }
 
   private mostrarToast(msg: string, type: 'ok' | 'err') {

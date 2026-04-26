@@ -232,6 +232,21 @@ export class SolicitudesService {
       );
   }
 
+  analizarConIA(incidenteId: number): Observable<{ success: boolean; analisis: any }> {
+    return this.http
+      .post<{ success: boolean; analisis: any }>(
+        `${environment.api.baseUrl}/api/emergencia/analizar-ia/${incidenteId}`,
+        {},
+        { headers: this.getHeaders(), timeout: environment.api.timeout }
+      )
+      .pipe(
+        catchError(err => {
+          const msg = err?.error?.detail || 'Error en análisis de IA';
+          return throwError(() => ({ message: msg }));
+        })
+      );
+  }
+
   limpiarEstado() {
     this.state.next({
       disponibles: [],

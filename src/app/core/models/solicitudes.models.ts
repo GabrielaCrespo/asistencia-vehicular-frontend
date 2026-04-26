@@ -64,6 +64,7 @@ export interface IaAnalisis {
   resumen_automatico: string | null;
   recomendaciones: string | null;
   fecha_analisis: string | null;
+  prioridad_ia: string | null;
 }
 
 export interface DetalleIncidente {

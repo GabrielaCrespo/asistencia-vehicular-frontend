@@ -802,15 +802,38 @@
 
         <!-- ── 4. CLASIFICACIÓN IA ── -->
         <div class="detalle-section full">
-          <div class="section-title">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
-              <line x1="12" y1="17" x2="12.01" y2="17"/>
-            </svg>
-            Análisis de IA
+          <div class="section-title ia-section-title">
+            <div class="ia-title-left">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+              Análisis de IA
+            </div>
+            <button
+              class="btn-analizar-ia"
+              (click)="analizarIA(detalle.incidente_id)"
+              [disabled]="analizandoIA">
+              <svg *ngIf="!analizandoIA" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/>
+              </svg>
+              <svg *ngIf="analizandoIA" class="spin" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+              </svg>
+              {{ analizandoIA ? 'Analizando...' : (detalle.ia_analisis ? 'Re-analizar' : 'Analizar con IA') }}
+            </button>
           </div>
           <ng-container *ngIf="detalle.ia_analisis; else sinIA">
+            <!-- Badge de prioridad determinada por IA -->
+            <div *ngIf="detalle.ia_analisis.prioridad_ia" class="ia-prioridad-row">
+              <span class="ia-prioridad-label">Prioridad determinada por IA:</span>
+              <span class="badge badge-lg" [ngClass]="prioridadClass(detalle.ia_analisis.prioridad_ia)">
+                {{ prioridadLabel(detalle.ia_analisis.prioridad_ia) }}
+              </span>
+              <span class="ia-prioridad-hint">(aplicada automáticamente al incidente)</span>
+            </div>
+
             <div class="ia-grid">
               <div *ngIf="detalle.ia_analisis.clasificacion" class="ia-item">
                 <div class="ia-item-label">Clasificación</div>
@@ -826,11 +849,11 @@
                 </div>
               </div>
               <div *ngIf="detalle.ia_analisis.resultado_imagen" class="ia-item">
-                <div class="ia-item-label">Resultado imagen</div>
+                <div class="ia-item-label">Daños en imagen</div>
                 <div class="ia-item-val">{{ detalle.ia_analisis.resultado_imagen }}</div>
               </div>
               <div *ngIf="detalle.ia_analisis.tipo_entrada" class="ia-item">
-                <div class="ia-item-label">Tipo entrada</div>
+                <div class="ia-item-label">Fuente analizada</div>
                 <div class="ia-item-val">{{ detalle.ia_analisis.tipo_entrada }}</div>
               </div>
             </div>
@@ -839,12 +862,12 @@
               <p class="ia-resumen-text">{{ detalle.ia_analisis.resumen_automatico }}</p>
             </div>
             <div *ngIf="detalle.ia_analisis.recomendaciones" class="ia-resumen">
-              <div class="ia-item-label">Recomendaciones</div>
+              <div class="ia-item-label">Recomendaciones para el técnico</div>
               <p class="ia-resumen-text">{{ detalle.ia_analisis.recomendaciones }}</p>
             </div>
           </ng-container>
           <ng-template #sinIA>
-            <p class="sin-evidencia">Sin análisis de IA para este incidente</p>
+            <p class="sin-evidencia">Sin análisis de IA — presiona "Analizar con IA" para procesar el incidente</p>
           </ng-template>
         </div>
 
