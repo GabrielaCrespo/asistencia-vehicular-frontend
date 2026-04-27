@@ -1,0 +1,130 @@
+<div class="notif-page">
+
+  <!-- HEADER -->
+  <header class="notif-header">
+    <div class="notif-header-inner">
+      <div class="notif-header-left">
+        <a routerLink="/dashboard" class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <polyline points="15 18 9 12 15 6"/>
+          </svg>
+          Dashboard
+        </a>
+        <div class="notif-title-wrap">
+          <div class="notif-title-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+          </div>
+          <div>
+            <h1>Notificaciones</h1>
+            <p class="notif-subtitle">
+              Historial de avisos
+              <span *ngIf="noLeidas > 0" class="badge-unread">{{ noLeidas }} sin leer</span>
+            </p>
+          </div>
+        </div>
+      </div>
+      <button *ngIf="noLeidas > 0" class="btn-mark-all" (click)="marcarTodasLeidas()">
+        Marcar todas como leídas
+      </button>
+    </div>
+  </header>
+
+  <!-- BODY -->
+  <main class="notif-body">
+    <div class="notif-wrap">
+
+      <!-- Loading state -->
+      <div *ngIf="loading" class="empty-state">
+        <div class="loading-spinner"></div>
+        <p class="empty-sub" style="margin-top:16px">Cargando notificaciones…</p>
+      </div>
+
+      <!-- Error state -->
+      <div *ngIf="!loading && error" class="empty-state">
+        <div class="empty-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.5" opacity="0.6">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+        </div>
+        <p class="empty-title">Error al cargar</p>
+        <p class="empty-sub">{{ error }}</p>
+        <button class="btn-mark-all" style="margin-top:16px" (click)="recargar()">Reintentar</button>
+      </div>
+
+      <!-- Empty state -->
+      <div *ngIf="!loading && !error && notificaciones.length === 0" class="empty-state">
+        <div class="empty-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.35">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+        </div>
+        <p class="empty-title">Sin notificaciones</p>
+        <p class="empty-sub">Las notificaciones aparecerán aquí cuando haya actividad en tu cuenta.</p>
+      </div>
+
+      <!-- Lista -->
+      <ul *ngIf="!loading && !error && notificaciones.length > 0" class="notif-list">
+        <li
+          *ngFor="let n of notificaciones"
+          class="notif-item"
+          [class.notif-unread]="!n.leida"
+          (click)="marcarLeida(n)"
+        >
+          <!-- Icono del tipo -->
+          <div class="notif-icon-wrap" [attr.data-tipo]="tipoIcon(n.tipo)">
+            <!-- alert -->
+            <svg *ngIf="tipoIcon(n.tipo) === 'alert'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <!-- check -->
+            <svg *ngIf="tipoIcon(n.tipo) === 'check'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            <!-- truck -->
+            <svg *ngIf="tipoIcon(n.tipo) === 'truck'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/>
+              <circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+            </svg>
+            <!-- tool -->
+            <svg *ngIf="tipoIcon(n.tipo) === 'tool'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+            </svg>
+            <!-- done -->
+            <svg *ngIf="tipoIcon(n.tipo) === 'done'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/>
+            </svg>
+            <!-- money -->
+            <svg *ngIf="tipoIcon(n.tipo) === 'money'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+            </svg>
+            <!-- bell (fallback) -->
+            <svg *ngIf="tipoIcon(n.tipo) === 'bell'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+          </div>
+
+          <!-- Contenido -->
+          <div class="notif-content">
+            <div class="notif-meta">
+              <span class="notif-tipo-label">{{ tipoLabel(n.tipo) }}</span>
+              <span class="notif-fecha">{{ n.fecha_creacion | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <p class="notif-titulo">{{ n.titulo }}</p>
+            <p class="notif-desc">{{ n.descripcion }}</p>
+          </div>
+
+          <!-- Punto no leída -->
+          <div *ngIf="!n.leida" class="notif-dot"></div>
+        </li>
+      </ul>
+
+    </div>
+  </main>
+
+</div>

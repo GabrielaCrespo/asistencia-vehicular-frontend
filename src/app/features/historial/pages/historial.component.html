@@ -1,0 +1,625 @@
+<div class="page">
+
+  <!-- ══ HEADER ══ -->
+  <header class="page-header">
+    <div class="header-inner">
+      <div class="header-left">
+        <a routerLink="/dashboard" class="back-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          Dashboard
+        </a>
+        <div class="header-title">
+          <div class="header-icon-wrap">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+          </div>
+          <div>
+            <h1>Historial del Taller</h1>
+            <p class="header-subtitle">Registro completo de solicitudes, servicios y transacciones</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══ BODY ══ -->
+  <main class="page-body">
+    <div class="body-wrap">
+
+      <!-- Error global -->
+      <div *ngIf="error$ | async as err" class="alert alert-error">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        {{ err }}
+      </div>
+
+      <!-- ── TABS ── -->
+      <div class="tabs-bar">
+        <button class="tab-btn" [class.active]="activeTab === 'resumen'" (click)="setTab('resumen')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Resumen
+        </button>
+        <button class="tab-btn" [class.active]="activeTab === 'solicitudes'" (click)="setTab('solicitudes')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Solicitudes
+        </button>
+        <button class="tab-btn" [class.active]="activeTab === 'servicios'" (click)="setTab('servicios')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+          Servicios realizados
+        </button>
+        <button class="tab-btn" [class.active]="activeTab === 'transacciones'" (click)="setTab('transacciones')">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+          Transacciones
+        </button>
+      </div>
+
+      <!-- ══════════════════════════════════════
+           TAB: RESUMEN
+      ══════════════════════════════════════ -->
+      <ng-container *ngIf="activeTab === 'resumen'">
+
+        <div *ngIf="loading$ | async" class="loading-row">
+          <div class="spinner"></div>
+          Cargando resumen…
+        </div>
+
+        <ng-container *ngIf="resumen$ | async as r">
+          <!-- Tarjetas de solicitudes -->
+          <div class="section-title">Estado de Solicitudes</div>
+          <div class="stats-grid-5">
+            <div class="stat-card ic-blue">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              </div>
+              <div class="stat-body">
+                <p class="stat-label">Total solicitudes</p>
+                <p class="stat-val">{{ r.total_solicitudes }}</p>
+              </div>
+            </div>
+            <div class="stat-card ic-teal">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+              <div class="stat-body">
+                <p class="stat-label">Completadas</p>
+                <p class="stat-val">{{ r.solicitudes_completadas }}</p>
+              </div>
+            </div>
+            <div class="stat-card ic-orange">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div class="stat-body">
+                <p class="stat-label">Pendientes</p>
+                <p class="stat-val">{{ r.solicitudes_pendientes }}</p>
+              </div>
+            </div>
+            <div class="stat-card ic-purple">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12"/></svg>
+              </div>
+              <div class="stat-body">
+                <p class="stat-label">En curso</p>
+                <p class="stat-val">{{ r.solicitudes_en_curso }}</p>
+              </div>
+            </div>
+            <div class="stat-card ic-red">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              </div>
+              <div class="stat-body">
+                <p class="stat-label">Rechazadas</p>
+                <p class="stat-val">{{ r.solicitudes_rechazadas }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tarjetas financieras y de calidad -->
+          <div class="section-title" style="margin-top: 0.5rem;">Ingresos y Calidad</div>
+          <div class="stats-grid-3">
+            <div class="stat-card ic-green">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+              </div>
+              <div class="stat-body">
+                <p class="stat-label">Ingresos netos</p>
+                <p class="stat-val stat-val-lg">{{ formatMoney(r.total_ingresos) }}</p>
+              </div>
+            </div>
+            <div class="stat-card ic-yellow">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+              <div class="stat-body">
+                <p class="stat-label">Calificación promedio</p>
+                <div class="stat-rating">
+                  <p class="stat-val">{{ r.calificacion_promedio > 0 ? r.calificacion_promedio.toFixed(1) : '—' }}</p>
+                  <span class="rating-of" *ngIf="r.calificacion_promedio > 0">/ 5 &nbsp;({{ r.total_calificaciones }} reseñas)</span>
+                </div>
+              </div>
+            </div>
+            <div class="stat-card ic-slate">
+              <div class="stat-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+              </div>
+              <div class="stat-body">
+                <p class="stat-label">Técnico más activo</p>
+                <p class="stat-val stat-val-name">{{ r.tecnico_mas_activo || '—' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Servicio más solicitado -->
+          <div class="highlight-card" *ngIf="r.servicio_mas_solicitado">
+            <div class="highlight-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+            </div>
+            <div>
+              <p class="highlight-label">Servicio más solicitado</p>
+              <p class="highlight-val">{{ r.servicio_mas_solicitado }}</p>
+            </div>
+          </div>
+
+          <!-- Barra de progreso visual -->
+          <div class="panel" *ngIf="r.total_solicitudes > 0">
+            <div class="panel-header-simple">Distribución de solicitudes</div>
+            <div class="progress-section">
+              <div class="progress-row">
+                <span class="progress-label">Completadas</span>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar bar-teal" [style.width.%]="(r.solicitudes_completadas / r.total_solicitudes) * 100"></div>
+                </div>
+                <span class="progress-pct">{{ ((r.solicitudes_completadas / r.total_solicitudes) * 100).toFixed(0) }}%</span>
+              </div>
+              <div class="progress-row">
+                <span class="progress-label">En curso</span>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar bar-blue" [style.width.%]="(r.solicitudes_en_curso / r.total_solicitudes) * 100"></div>
+                </div>
+                <span class="progress-pct">{{ ((r.solicitudes_en_curso / r.total_solicitudes) * 100).toFixed(0) }}%</span>
+              </div>
+              <div class="progress-row">
+                <span class="progress-label">Rechazadas</span>
+                <div class="progress-bar-wrap">
+                  <div class="progress-bar bar-red" [style.width.%]="(r.solicitudes_rechazadas / r.total_solicitudes) * 100"></div>
+                </div>
+                <span class="progress-pct">{{ ((r.solicitudes_rechazadas / r.total_solicitudes) * 100).toFixed(0) }}%</span>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <div *ngIf="!(loading$ | async) && !(resumen$ | async)" class="empty-state">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+          <p>Sin datos de historial</p>
+          <span>El resumen aparecerá aquí cuando el taller tenga actividad registrada</span>
+        </div>
+
+      </ng-container>
+
+      <!-- ══════════════════════════════════════
+           TAB: SOLICITUDES
+      ══════════════════════════════════════ -->
+      <ng-container *ngIf="activeTab === 'solicitudes'">
+
+        <!-- Filtros -->
+        <div class="filtros-panel">
+          <div class="filtros-header">
+            <div class="filtros-title">
+              <div class="filtros-icon">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+              </div>
+              Filtrar solicitudes
+            </div>
+            <button class="btn-limpiar" (click)="limpiarFiltroSolicitudes()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              Limpiar filtros
+            </button>
+          </div>
+          <div class="filtros-fields">
+            <div class="filtro-field">
+              <label class="filtro-label">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Estado
+              </label>
+              <div class="filtro-control">
+                <select class="filtro-select" [(ngModel)]="filtroSolicitudesEstado">
+                  <option value="">Todos los estados</option>
+                  <option value="pendiente">Pendiente</option>
+                  <option value="aceptada">Aceptada</option>
+                  <option value="en_camino">En camino</option>
+                  <option value="en_servicio">En servicio</option>
+                  <option value="completada">Completada</option>
+                  <option value="rechazada">Rechazada</option>
+                </select>
+                <span class="filtro-active-dot" *ngIf="filtroSolicitudesEstado"></span>
+              </div>
+            </div>
+            <div class="filtro-field">
+              <label class="filtro-label">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Desde
+              </label>
+              <div class="filtro-control">
+                <input type="date" class="filtro-input" [(ngModel)]="filtroSolicitudesFechaDesde">
+                <span class="filtro-active-dot" *ngIf="filtroSolicitudesFechaDesde"></span>
+              </div>
+            </div>
+            <div class="filtro-field">
+              <label class="filtro-label">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                Hasta
+              </label>
+              <div class="filtro-control">
+                <input type="date" class="filtro-input" [(ngModel)]="filtroSolicitudesFechaHasta">
+                <span class="filtro-active-dot" *ngIf="filtroSolicitudesFechaHasta"></span>
+              </div>
+            </div>
+            <div class="filtro-field filtro-field-btn">
+              <button class="btn-filtrar" (click)="aplicarFiltroSolicitudes()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                Aplicar filtros
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="loading$ | async" class="loading-row">
+          <div class="spinner"></div>Cargando solicitudes…
+        </div>
+
+        <ng-container *ngIf="solicitudes$ | async as lista">
+          <div *ngIf="lista.length === 0 && !(loading$ | async)" class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <p>Sin solicitudes</p>
+            <span>No se encontraron solicitudes con los filtros aplicados</span>
+          </div>
+
+          <div *ngIf="lista.length > 0" class="panel">
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Estado</th>
+                    <th>Cliente</th>
+                    <th>Vehículo</th>
+                    <th>Tipo problema</th>
+                    <th>Técnico</th>
+                    <th>Fecha solicitud</th>
+                    <th>Duración</th>
+                    <th>Cobrado</th>
+                    <th>Cal.</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let s of lista">
+                    <td class="td-id">#{{ s.incidente_id }}</td>
+                    <td><span class="estado-badge" [ngClass]="estadoClass(s.estado)">{{ estadoLabel(s.estado) }}</span></td>
+                    <td class="fw-600">{{ s.cliente_nombre }}</td>
+                    <td class="td-small">
+                      <span *ngIf="s.vehiculo_marca">{{ s.vehiculo_marca }} {{ s.vehiculo_modelo }}</span>
+                      <span *ngIf="s.vehiculo_placa" class="placa">{{ s.vehiculo_placa }}</span>
+                      <span *ngIf="!s.vehiculo_marca" class="text-muted">—</span>
+                    </td>
+                    <td>
+                      <span *ngIf="s.tipo_problema" class="badge-tipo">{{ s.tipo_problema }}</span>
+                      <span *ngIf="!s.tipo_problema" class="text-muted">—</span>
+                    </td>
+                    <td>{{ s.tecnico_nombre || '—' }}</td>
+                    <td class="td-date">{{ formatDate(s.fecha_solicitud) }}</td>
+                    <td class="td-small">
+                      <span *ngIf="s.duracion_minutos">{{ s.duracion_minutos }} min</span>
+                      <span *ngIf="!s.duracion_minutos" class="text-muted">—</span>
+                    </td>
+                    <td class="fw-600 text-teal">{{ formatMoney(s.monto_cobrado) }}</td>
+                    <td>
+                      <span *ngIf="s.calificacion" class="calificacion">{{ s.calificacion }}★</span>
+                      <span *ngIf="!s.calificacion" class="text-muted">—</span>
+                    </td>
+                    <td>
+                      <button class="btn-ver" (click)="verDetalle(s.incidente_id)">Ver</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </ng-container>
+
+      </ng-container>
+
+      <!-- ══════════════════════════════════════
+           TAB: SERVICIOS REALIZADOS
+      ══════════════════════════════════════ -->
+      <ng-container *ngIf="activeTab === 'servicios'">
+
+        <div *ngIf="loading$ | async" class="loading-row">
+          <div class="spinner"></div>Cargando servicios realizados…
+        </div>
+
+        <ng-container *ngIf="servicios$ | async as lista">
+          <div *ngIf="lista.length === 0 && !(loading$ | async)" class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+            <p>Sin servicios completados</p>
+            <span>Los servicios realizados aparecerán aquí cuando se completen asignaciones</span>
+          </div>
+
+          <div *ngIf="lista.length > 0" class="services-list">
+            <div class="service-card" *ngFor="let s of lista">
+              <div class="service-card-header">
+                <div class="service-date">{{ formatDate(s.fecha_servicio) }}</div>
+                <div class="service-cal" *ngIf="s.calificacion">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="#eab308" stroke="#eab308" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  {{ s.calificacion }}/5
+                </div>
+              </div>
+              <div class="service-card-body">
+                <div class="service-info">
+                  <p class="service-cliente">{{ s.cliente_nombre }}</p>
+                  <p class="service-vehiculo" *ngIf="s.vehiculo_marca">
+                    {{ s.vehiculo_marca }} {{ s.vehiculo_modelo }}
+                    <span *ngIf="s.vehiculo_placa" class="placa">{{ s.vehiculo_placa }}</span>
+                  </p>
+                  <p class="service-tecnico" *ngIf="s.tecnico_nombre">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    {{ s.tecnico_nombre }}
+                  </p>
+                  <div class="service-servicios" *ngIf="s.servicios_realizados">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+                    {{ s.servicios_realizados }}
+                  </div>
+                </div>
+                <div class="service-montos">
+                  <div class="monto-row">
+                    <span class="monto-label">Total</span>
+                    <span class="monto-val fw-600">{{ formatMoney(s.monto_total) }}</span>
+                  </div>
+                  <div class="monto-row monto-taller">
+                    <span class="monto-label">Tu ingreso</span>
+                    <span class="monto-val fw-700 text-teal">{{ formatMoney(s.monto_taller) }}</span>
+                  </div>
+                  <div class="rating-mini" *ngIf="s.puntuacion_atencion || s.puntuacion_puntualidad || s.puntuacion_limpieza">
+                    <span *ngIf="s.puntuacion_atencion" class="rating-item">Atención {{ s.puntuacion_atencion }}★</span>
+                    <span *ngIf="s.puntuacion_puntualidad" class="rating-item">Puntualidad {{ s.puntuacion_puntualidad }}★</span>
+                    <span *ngIf="s.puntuacion_limpieza" class="rating-item">Limpieza {{ s.puntuacion_limpieza }}★</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+      </ng-container>
+
+      <!-- ══════════════════════════════════════
+           TAB: TRANSACCIONES
+      ══════════════════════════════════════ -->
+      <ng-container *ngIf="activeTab === 'transacciones'">
+
+        <!-- Filtros -->
+        <div class="filtros-panel">
+          <div class="filtros-row">
+            <div class="filtro-group">
+              <label class="filtro-label">Comisión</label>
+              <select class="filtro-select" [(ngModel)]="filtroTransEstadoComision">
+                <option value="">Todas</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="pagado">Pagada</option>
+              </select>
+            </div>
+            <div class="filtro-group">
+              <label class="filtro-label">Método de pago</label>
+              <select class="filtro-select" [(ngModel)]="filtroTransMetodoPago">
+                <option value="">Todos</option>
+                <option value="efectivo">Efectivo</option>
+                <option value="tarjeta">Tarjeta</option>
+                <option value="transferencia">Transferencia</option>
+              </select>
+            </div>
+            <div class="filtro-group">
+              <label class="filtro-label">Desde</label>
+              <input type="date" class="filtro-input" [(ngModel)]="filtroTransFechaDesde">
+            </div>
+            <div class="filtro-group">
+              <label class="filtro-label">Hasta</label>
+              <input type="date" class="filtro-input" [(ngModel)]="filtroTransFechaHasta">
+            </div>
+            <div class="filtro-actions">
+              <button class="btn-filtrar" (click)="aplicarFiltroTransacciones()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                Filtrar
+              </button>
+              <button class="btn-limpiar" (click)="limpiarFiltroTransacciones()">Limpiar</button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="loading$ | async" class="loading-row">
+          <div class="spinner"></div>Cargando transacciones…
+        </div>
+
+        <ng-container *ngIf="transacciones$ | async as lista">
+          <div *ngIf="lista.length === 0 && !(loading$ | async)" class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            <p>Sin transacciones</p>
+            <span>Las transacciones aparecerán aquí cuando se completen pagos</span>
+          </div>
+
+          <div *ngIf="lista.length > 0" class="panel">
+            <div class="table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Cliente</th>
+                    <th>Tipo problema</th>
+                    <th>Método</th>
+                    <th class="text-right">Total</th>
+                    <th class="text-right">Tu ingreso</th>
+                    <th class="text-right">Comisión</th>
+                    <th>Estado comisión</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let t of lista">
+                    <td class="td-date">{{ formatDate(t.fecha_pago) }}</td>
+                    <td class="fw-600">{{ t.cliente_nombre }}</td>
+                    <td>
+                      <span *ngIf="t.tipo_problema" class="badge-tipo">{{ t.tipo_problema }}</span>
+                      <span *ngIf="!t.tipo_problema" class="text-muted">—</span>
+                    </td>
+                    <td>{{ metodoPagoLabel(t.metodo_pago) }}</td>
+                    <td class="text-right fw-600">{{ formatMoney(t.monto_total) }}</td>
+                    <td class="text-right fw-700 text-teal">{{ formatMoney(t.monto_taller) }}</td>
+                    <td class="text-right text-orange">{{ formatMoney(t.comision_plataforma) }}</td>
+                    <td>
+                      <span class="badge-comision"
+                        [class.pagado]="t.estado_comision === 'pagado'"
+                        [class.pendiente]="t.estado_comision === 'pendiente'">
+                        {{ t.estado_comision === 'pagado' ? 'Pagada' : 'Pendiente' }}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </ng-container>
+
+      </ng-container>
+
+    </div><!-- /body-wrap -->
+  </main>
+
+</div><!-- /page -->
+
+<!-- ══════════════════════════════════════
+     MODAL: DETALLE DE SOLICITUD
+══════════════════════════════════════ -->
+<div *ngIf="showDetalle" class="modal-overlay" (click)="cerrarDetalle()">
+  <div class="modal modal-lg" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <div class="modal-title">
+        <div class="modal-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <h2>Detalle de Solicitud</h2>
+      </div>
+      <button class="close-btn" (click)="cerrarDetalle()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body" *ngIf="loadingDetalle$ | async">
+      <div class="loading-row">
+        <div class="spinner"></div>Cargando detalle…
+      </div>
+    </div>
+
+    <ng-container *ngIf="!(loadingDetalle$ | async)">
+      <div class="modal-body" *ngIf="detalle$ | async as d">
+
+        <!-- Estado y fechas -->
+        <div class="detalle-header-row">
+          <span class="estado-badge" [ngClass]="estadoClass(d.estado)">{{ estadoLabel(d.estado) }}</span>
+          <span class="badge-tipo" *ngIf="d.tipo_problema">{{ d.tipo_problema }}</span>
+          <span class="prio-badge" [ngClass]="prioridadClass(d.prioridad)">{{ d.prioridad }}</span>
+        </div>
+
+        <div class="detalle-grid">
+          <!-- Cliente -->
+          <div class="detalle-section">
+            <h4 class="detalle-section-title">Cliente</h4>
+            <div class="detalle-field"><span>Nombre</span><strong>{{ d.cliente_nombre }}</strong></div>
+            <div class="detalle-field" *ngIf="d.cliente_telefono"><span>Teléfono</span><strong>{{ d.cliente_telefono }}</strong></div>
+            <div class="detalle-field" *ngIf="d.cliente_email"><span>Email</span><strong>{{ d.cliente_email }}</strong></div>
+          </div>
+
+          <!-- Vehículo -->
+          <div class="detalle-section" *ngIf="d.vehiculo_marca">
+            <h4 class="detalle-section-title">Vehículo</h4>
+            <div class="detalle-field"><span>Vehículo</span><strong>{{ d.vehiculo_marca }} {{ d.vehiculo_modelo }} {{ d.vehiculo_anio }}</strong></div>
+            <div class="detalle-field" *ngIf="d.vehiculo_placa"><span>Placa</span><strong class="placa">{{ d.vehiculo_placa }}</strong></div>
+            <div class="detalle-field" *ngIf="d.vehiculo_color"><span>Color</span><strong>{{ d.vehiculo_color }}</strong></div>
+          </div>
+
+          <!-- Técnico -->
+          <div class="detalle-section" *ngIf="d.tecnico_nombre">
+            <h4 class="detalle-section-title">Técnico asignado</h4>
+            <div class="detalle-field"><span>Nombre</span><strong>{{ d.tecnico_nombre }}</strong></div>
+            <div class="detalle-field" *ngIf="d.tecnico_especialidad"><span>Especialidad</span><strong>{{ d.tecnico_especialidad }}</strong></div>
+          </div>
+
+          <!-- Tiempos -->
+          <div class="detalle-section">
+            <h4 class="detalle-section-title">Tiempos</h4>
+            <div class="detalle-field"><span>Solicitud recibida</span><strong>{{ formatDateTime(d.fecha_solicitud) }}</strong></div>
+            <div class="detalle-field" *ngIf="d.fecha_aceptacion"><span>Aceptada</span><strong>{{ formatDateTime(d.fecha_aceptacion) }}</strong></div>
+            <div class="detalle-field" *ngIf="d.fecha_inicio_servicio"><span>Inicio servicio</span><strong>{{ formatDateTime(d.fecha_inicio_servicio) }}</strong></div>
+            <div class="detalle-field" *ngIf="d.fecha_cierre_servicio"><span>Cierre</span><strong>{{ formatDateTime(d.fecha_cierre_servicio) }}</strong></div>
+            <div class="detalle-field" *ngIf="d.duracion_real_minutos"><span>Duración real</span><strong>{{ d.duracion_real_minutos }} minutos</strong></div>
+            <div class="detalle-field" *ngIf="d.tiempo_estimado_minutos"><span>Tiempo estimado</span><strong>{{ d.tiempo_estimado_minutos }} minutos</strong></div>
+          </div>
+        </div>
+
+        <!-- Descripción -->
+        <div class="detalle-desc" *ngIf="d.descripcion">
+          <h4 class="detalle-section-title">Descripción del incidente</h4>
+          <p>{{ d.descripcion }}</p>
+        </div>
+
+        <!-- Servicios -->
+        <div class="detalle-desc" *ngIf="d.servicios_realizados">
+          <h4 class="detalle-section-title">Servicios realizados</h4>
+          <p>{{ d.servicios_realizados }}</p>
+        </div>
+
+        <!-- IA -->
+        <div class="detalle-ia" *ngIf="d.ia_clasificacion || d.ia_resumen">
+          <h4 class="detalle-section-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Análisis IA
+          </h4>
+          <div class="detalle-field" *ngIf="d.ia_clasificacion"><span>Clasificación</span><strong>{{ d.ia_clasificacion }}</strong></div>
+          <div class="detalle-desc-text" *ngIf="d.ia_resumen"><em>{{ d.ia_resumen }}</em></div>
+          <div class="detalle-desc-text" *ngIf="d.ia_recomendaciones">
+            <strong>Recomendaciones:</strong> {{ d.ia_recomendaciones }}
+          </div>
+        </div>
+
+        <!-- Pago -->
+        <div class="detalle-pago" *ngIf="d.monto_total">
+          <h4 class="detalle-section-title">Información de pago</h4>
+          <div class="pago-row">
+            <div class="pago-item"><span>Total cobrado</span><strong>{{ formatMoney(d.monto_total) }}</strong></div>
+            <div class="pago-item pago-taller"><span>Tu ingreso (90%)</span><strong class="text-teal">{{ formatMoney(d.monto_taller) }}</strong></div>
+            <div class="pago-item"><span>Comisión (10%)</span><strong class="text-orange">{{ formatMoney(d.comision_plataforma) }}</strong></div>
+            <div class="pago-item" *ngIf="d.metodo_pago"><span>Método</span><strong>{{ metodoPagoLabel(d.metodo_pago) }}</strong></div>
+          </div>
+        </div>
+
+        <!-- Calificación -->
+        <div class="detalle-calificacion" *ngIf="d.calificacion">
+          <h4 class="detalle-section-title">Calificación del cliente</h4>
+          <div class="stars-row">
+            <svg *ngFor="let s of starsArray(d.calificacion)" width="18" height="18" viewBox="0 0 24 24" fill="#eab308" stroke="#eab308" stroke-width="1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span class="calificacion-num">{{ d.calificacion }} / 5</span>
+          </div>
+          <p class="comentario" *ngIf="d.comentario_calificacion">"{{ d.comentario_calificacion }}"</p>
+        </div>
+
+        <!-- Observaciones -->
+        <div class="detalle-desc" *ngIf="d.observaciones">
+          <h4 class="detalle-section-title">Observaciones del taller</h4>
+          <p>{{ d.observaciones }}</p>
+        </div>
+
+      </div>
+    </ng-container>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="cerrarDetalle()">Cerrar</button>
+    </div>
+  </div>
+</div>

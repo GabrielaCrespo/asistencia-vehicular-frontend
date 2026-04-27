@@ -13,6 +13,7 @@ import { tecnicosRoutes } from './features/tecnicos/tecnicos.routes';
 import { serviciosRoutes } from './features/servicios/servicios.routes';
 import { solicitudesRoutes } from './features/solicitudes/solicitudes.routes';
 import { ingresosRoutes } from './features/ingresos/ingresos.routes';
+import { historialRoutes } from './features/historial/historial.routes';
 
 export const routes: Routes = [
   // LANDING PAGE / BIENVENIDA
@@ -65,12 +66,31 @@ export const routes: Routes = [
     data: { title: 'Ingresos y Comisiones' }
   },
 
+  // Ruta protegida: Historial del Taller
+  {
+    path: 'historial',
+    canActivate: [authGuard],
+    children: historialRoutes,
+    data: { title: 'Historial del Taller' }
+  },
+
   // Ruta protegida: Perfil del Taller
   {
     path: 'perfil',
     canActivate: [authGuard],
     loadComponent: () => import('./features/perfil/perfil.component').then(m => m.PerfilComponent),
     data: { title: 'Perfil del Taller' }
+  },
+
+  // Ruta protegida: Notificaciones
+  {
+    path: 'notificaciones',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/notificaciones/notificaciones.component').then(
+        m => m.NotificacionesComponent,
+      ),
+    data: { title: 'Notificaciones' },
   },
 
   // Ruta comodín para página no encontrada
