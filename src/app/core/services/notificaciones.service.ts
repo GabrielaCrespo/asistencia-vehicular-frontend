@@ -18,6 +18,7 @@ export class NotificacionesService implements OnDestroy {
   private storage = inject(StorageService);
 
   private apiUrl = `${environment.api.baseUrl}/api/notificaciones`;
+  private wsUrl = environment.api.baseUrl.replace('http', 'ws');
 
   private state = new BehaviorSubject<NotificacionesState>({
     notificaciones: [],
@@ -30,13 +31,90 @@ export class NotificacionesService implements OnDestroy {
   public notificaciones$ = this.state$.pipe(map(s => s.notificaciones));
   public noLeidas$ = this.state$.pipe(map(s => s.noLeidas));
 
+  // ── WebSocket ──────────────────────────────────────────
+  private ws: WebSocket | null = null;
+  private wsReconnectTimer: any = null;
+
+  // ── Polling (fallback) ─────────────────────────────────
   private pollingSub?: Subscription;
 
   private getHeaders(): HttpHeaders {
     return new HttpHeaders({ Authorization: `Bearer ${this.storage.getToken() ?? ''}` });
   }
 
+  // ── WEBSOCKET ──────────────────────────────────────────
+
+  connectWebSocket(): void {
+    const token = this.storage.getToken();
+    if (!token) return;
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) return;
+
+    this.ws = new WebSocket(`${this.wsUrl}/ws?token=${token}`);
+
+    this.ws.onopen = () => {
+      console.log('[WS] Conectado al servidor de tiempo real');
+      // Iniciar ping cada 30s para mantener la conexión viva
+      this.wsReconnectTimer = setInterval(() => {
+        if (this.ws?.readyState === WebSocket.OPEN) {
+          this.ws.send('ping');
+        }
+      }, 30_000);
+    };
+
+    this.ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.tipo === 'pong' || data.tipo === 'conexion_establecida') return;
+
+        // Agregar la nueva notificación al estado actual
+        const nuevaNotif = {
+          notificacion_id: Date.now(),
+          tipo: data.tipo,
+          titulo: data.titulo,
+          descripcion: data.mensaje,
+          datos_asociados: data,
+          leida: false,
+          fecha_creacion: new Date().toISOString(),
+        };
+
+        const notificaciones = [nuevaNotif, ...this.state.value.notificaciones];
+        this.state.next({
+          ...this.state.value,
+          notificaciones,
+          noLeidas: this.state.value.noLeidas + 1,
+        });
+      } catch (e) {
+        console.error('[WS] Error procesando mensaje:', e);
+      }
+    };
+
+    this.ws.onclose = () => {
+      console.log('[WS] Conexión cerrada');
+      clearInterval(this.wsReconnectTimer);
+      // Solo reconectar si hay token activo, máximo 1 intento cada 30s
+      if (this.storage.getToken()) {
+        setTimeout(() => this.connectWebSocket(), 30_000);
+      }
+    };
+
+    this.ws.onerror = () => {
+      this.ws = null;
+    };
+  }
+
+  disconnectWebSocket(): void {
+    clearInterval(this.wsReconnectTimer);
+    this.ws?.close();
+    this.ws = null;
+  }
+
+  // ── POLLING (fallback, mantener por compatibilidad) ────
+
   startPolling(): void {
+    // Primero conectar WebSocket
+    this.connectWebSocket();
+
+    // Polling para cargar notificaciones históricas
     if (this.pollingSub && !this.pollingSub.closed) return;
     this.pollingSub = timer(0, POLL_INTERVAL_MS)
       .pipe(
@@ -48,7 +126,7 @@ export class NotificacionesService implements OnDestroy {
             .get<NotificacionesResponse>(this.apiUrl, { headers: this.getHeaders() })
             .pipe(
               catchError(err => {
-                console.error('[Notificaciones] Error al consultar notificaciones:', err?.status, err?.error);
+                console.error('[Notificaciones] Error:', err?.status);
                 this.state.next({
                   ...this.state.value,
                   loading: false,
@@ -73,6 +151,7 @@ export class NotificacionesService implements OnDestroy {
 
   stopPolling(): void {
     this.pollingSub?.unsubscribe();
+    this.disconnectWebSocket();
   }
 
   marcarLeida(id: number): void {
