@@ -21,6 +21,8 @@ import { LoginRequest } from '../../../../core/models/auth.models';
 import { environment } from '../../../../environments/environment';
 import { ThemeService } from '../../../../core/services/theme.service';
 
+type LoginMode = 'taller' | 'organizacion';
+
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -89,15 +91,22 @@ import { ThemeService } from '../../../../core/services/theme.service';
             <p>Ingresa tus credenciales para continuar</p>
           </div>
 
-          <!-- Demo info -->
-          <div class="demo-box">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
-              <line x1="12" y1="16" x2="12.01" y2="16"/>
-            </svg>
-            <div>
-              <strong>Demo:</strong> taller.express&#64;example.com &nbsp;/&nbsp; <strong>Contraseña:</strong> taller123
-            </div>
+          <!-- Toggle de modo -->
+          <div class="mode-toggle">
+            <button type="button" class="mode-btn" [class.active]="loginMode === 'taller'" (click)="setLoginMode('taller')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9 22 9 12 15 12 15 22"/>
+              </svg>
+              Taller
+            </button>
+            <button type="button" class="mode-btn" [class.active]="loginMode === 'organizacion'" (click)="setLoginMode('organizacion')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+              </svg>
+              Organización
+            </button>
           </div>
 
           <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form" novalidate>
@@ -164,7 +173,8 @@ import { ThemeService } from '../../../../core/services/theme.service';
           </form>
 
           <div class="card-footer">
-            <p>¿No tienes cuenta? <a routerLink="/auth/register">Regístrate aquí</a></p>
+            <p *ngIf="loginMode === 'taller'">¿No tienes cuenta? <a routerLink="/auth/register">Registra tu taller</a></p>
+            <p *ngIf="loginMode === 'organizacion'">¿Sin organización? <a routerLink="/auth/org-register">Crea tu organización</a></p>
           </div>
 
         </div>
@@ -558,6 +568,48 @@ import { ThemeService } from '../../../../core/services/theme.service';
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* ══ MODE TOGGLE ══ */
+    .mode-toggle {
+      display: flex;
+      gap: 0.5rem;
+      background: var(--bg2, #f1f5f9);
+      border-radius: 10px;
+      padding: 0.25rem;
+      margin-bottom: 1.25rem;
+    }
+
+    html.dark-theme .mode-toggle { background: var(--bg3, #1e293b); }
+
+    .mode-btn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.5rem 0.75rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--txt2, #475569);
+      background: transparent;
+      transition: all 0.18s ease;
+    }
+
+    .mode-btn.active {
+      background: white;
+      color: #5cbdb9;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+
+    html.dark-theme .mode-btn.active {
+      background: var(--bg2, #334155);
+      color: #5cbdb9;
+    }
+
+    .mode-btn:hover:not(.active) { color: #5cbdb9; }
+
     /* Card footer */
     .card-footer {
       text-align: center;
@@ -626,6 +678,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   isLoading = false;
   errorMessage = '';
   showPassword = false;
+  loginMode: LoginMode = 'taller';
 
   // Limpieza de suscripciones
   private destroy$ = new Subject<void>();
@@ -662,8 +715,13 @@ export class LoginComponent implements OnInit, OnDestroy {
       });
   }
 
+  setLoginMode(mode: LoginMode): void {
+    this.loginMode = mode;
+    this.errorMessage = '';
+  }
+
   /**
-   * Envía el formulario de login
+   * Envía el formulario de login (taller o tenant_admin según modo)
    */
   onSubmit(): void {
     if (this.loginForm.invalid) {
@@ -676,18 +734,21 @@ export class LoginComponent implements OnInit, OnDestroy {
       password: this.loginForm.get('password')?.value
     };
 
-    this.authService.login(credentials)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          // Redireccionar al dashboard
-          this.router.navigate([environment.auth.routes.dashboard]);
-        },
-        error: (err) => {
-          console.error('Login error:', err);
-          // El error ya está seteado en authService
-        }
-      });
+    if (this.loginMode === 'organizacion') {
+      this.authService.loginOrg(credentials)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => this.router.navigate([environment.auth.routes.orgDashboard]),
+          error: (err) => console.error('Org login error:', err)
+        });
+    } else {
+      this.authService.login(credentials)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => this.router.navigate([environment.auth.routes.dashboard]),
+          error: (err) => console.error('Login error:', err)
+        });
+    }
   }
 
   /**

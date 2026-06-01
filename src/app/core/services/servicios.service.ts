@@ -48,10 +48,7 @@ export class ServiciosService {
 
   public servicios$ = this.serviciosState.asObservable();
 
-  constructor() {
-    // Cargar catálogo al inicializar
-    this.listarCatalogo().subscribe();
-  }
+  constructor() {}
 
   // ============== GETTERS ==============
 

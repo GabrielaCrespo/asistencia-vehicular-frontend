@@ -8,7 +8,7 @@
 import { Routes } from '@angular/router';
 import { WelcomeComponent } from './features/welcome/welcome.component';
 import { AUTH_ROUTES } from './features/auth/auth.routes';
-import { authGuard } from './core/guards/auth.guard';
+import { authGuard, orgGuard } from './core/guards/auth.guard';
 import { tecnicosRoutes } from './features/tecnicos/tecnicos.routes';
 import { serviciosRoutes } from './features/servicios/servicios.routes';
 import { solicitudesRoutes } from './features/solicitudes/solicitudes.routes';
@@ -91,6 +91,41 @@ export const routes: Routes = [
         m => m.NotificacionesComponent,
       ),
     data: { title: 'Notificaciones' },
+  },
+
+  // Rutas del portal Organización (tenant_admin)
+  {
+    path: 'organizacion',
+    canActivate: [orgGuard],
+    loadComponent: () => import('./features/organizacion/org-layout.component').then(m => m.OrgLayoutComponent),
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./features/organizacion/pages/org-dashboard.component').then(m => m.OrgDashboardComponent),
+        data: { title: 'Dashboard - Organización' }
+      },
+      {
+        path: 'talleres',
+        loadComponent: () => import('./features/organizacion/pages/org-talleres.component').then(m => m.OrgTalleresComponent),
+        data: { title: 'Talleres - Organización' }
+      },
+      {
+        path: 'tecnicos',
+        loadComponent: () => import('./features/organizacion/pages/org-tecnicos.component').then(m => m.OrgTecnicosComponent),
+        data: { title: 'Técnicos - Organización' }
+      },
+      {
+        path: 'incidentes',
+        loadComponent: () => import('./features/organizacion/pages/org-incidentes.component').then(m => m.OrgIncidentesComponent),
+        data: { title: 'Incidentes - Organización' }
+      },
+      {
+        path: 'reportes',
+        loadComponent: () => import('./features/organizacion/pages/org-reportes.component').then(m => m.OrgReportesComponent),
+        data: { title: 'Reportes - Organización' }
+      },
+    ]
   },
 
   // Ruta comodín para página no encontrada

@@ -530,7 +530,7 @@ export class SolicitudesComponent implements OnInit, OnDestroy {
     clearTimeout(this.toastTimer);
     this.toastMsg = msg;
     this.toastType = type;
-    this.toastTimer = setTimeout(() => { this.toastMsg = ''; }, 3500);
+    this.toastTimer = setTimeout(() => { this.toastMsg = ''; this.cdr.markForCheck(); }, 3500);
   }
 
   ngOnDestroy() {

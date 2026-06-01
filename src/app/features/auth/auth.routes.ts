@@ -17,14 +17,20 @@ export const AUTH_ROUTES: Routes = [
       {
         path: 'login',
         component: LoginComponent,
-        canActivate: [noAuthGuard], // No accesibles si está autenticado
-        data: { title: 'Iniciar Sesión - Taller' }
+        canActivate: [noAuthGuard],
+        data: { title: 'Iniciar Sesión' }
       },
       {
         path: 'register',
         component: RegisterComponent,
-        canActivate: [noAuthGuard], // No accesibles si está autenticado
+        canActivate: [noAuthGuard],
         data: { title: 'Registrar Taller' }
+      },
+      {
+        path: 'org-register',
+        loadComponent: () => import('./pages/org-register/org-register.component').then(m => m.OrgRegisterComponent),
+        canActivate: [noAuthGuard],
+        data: { title: 'Crear Organización' }
       },
       {
         path: '',

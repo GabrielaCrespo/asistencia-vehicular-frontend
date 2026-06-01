@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Subject } from 'rxjs';
@@ -21,6 +21,7 @@ type Tab = 'ingresos' | 'pendientes' | 'historial';
 export class IngresosComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private ingresosService = inject(IngresosService);
+  private cdr = inject(ChangeDetectorRef);
   private destroy$ = new Subject<void>();
 
   currentUser: CurrentUser | null = null;
@@ -129,7 +130,7 @@ export class IngresosComponent implements OnInit, OnDestroy {
     clearTimeout(this.toastTimer);
     this.toastMsg = msg;
     this.toastType = type;
-    this.toastTimer = setTimeout(() => { this.toastMsg = ''; }, 3500);
+    this.toastTimer = setTimeout(() => { this.toastMsg = ''; this.cdr.markForCheck(); }, 3500);
   }
 
   ngOnDestroy() {

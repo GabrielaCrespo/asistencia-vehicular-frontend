@@ -63,6 +63,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
         this.currentUser = user;
+        // Redirigir al portal de organización si el usuario es tenant_admin
+        if (user?.rol === 'tenant_admin') {
+          this.router.navigate([environment.auth.routes.orgDashboard]);
+          return;
+        }
         if (user?.taller_id) this.cargarStats(user.taller_id);
       });
 
