@@ -56,7 +56,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     { label: 'Ingresos',   url: '/ingresos',    description: 'Visualiza ingresos y gestiona comisiones de la plataforma',color: '#16a34a', bgColor: '#f0fdf4' },
     { label: 'Historial',  url: '/historial',   description: 'Registro completo de solicitudes, servicios y transacciones', color: '#7c3aed', bgColor: '#f5f3ff' },
     { label: 'Perfil',     url: '/perfil',      description: 'Actualiza la información y horario de tu taller',          color: '#db2777', bgColor: '#fdf2f8' },
-    { label: 'Monitoreo',  url: '/monitoreo',   description: 'Seguimiento en tiempo real de tus técnicos', color: '#0ea5e9', bgColor: '#f0f9ff' },
+    { label: 'Monitoreo',    url: '/monitoreo',    description: 'Seguimiento en tiempo real de tus técnicos',          color: '#0ea5e9', bgColor: '#f0f9ff' },
   ];
 
   ngOnInit(): void {
@@ -64,6 +64,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
         this.currentUser = user;
+        // Redirigir al portal de organización si el usuario es tenant_admin
+        if (user?.rol === 'tenant_admin') {
+          this.router.navigate([environment.auth.routes.orgDashboard]);
+          return;
+        }
         if (user?.taller_id) this.cargarStats(user.taller_id);
       });
 

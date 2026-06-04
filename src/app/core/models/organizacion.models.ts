@@ -1,0 +1,119 @@
+export interface OrgDashboard {
+  organizacion_id: number;
+  organizacion_nombre: string;
+  plan: string;
+  total_talleres: number;
+  total_tecnicos: number;
+  total_incidentes: number;
+  incidentes_completados: number;
+  incidentes_pendientes: number;
+  incidentes_en_progreso: number;
+  ingresos_totales: number;
+  ingresos_talleres: number;
+  comisiones_plataforma: number;
+  calificacion_promedio: number;
+}
+
+export interface TallerResumen {
+  taller_id: number;
+  razon_social: string;
+  direccion?: string;
+  telefono_operativo?: string;
+  horario_inicio?: string;
+  horario_fin?: string;
+  disponible: boolean;
+  calificacion_promedio: number;
+  total_tecnicos: number;
+  tecnicos_disponibles: number;
+  servicios_completados: number;
+  ingresos_totales: number;
+  latitud?: number;
+  longitud?: number;
+}
+
+export interface TallerEnOrgCreate {
+  nombre_contacto: string;
+  email: string;
+  telefono: string;
+  password: string;
+  documento_identidad: string;
+  razon_social: string;
+  direccion: string;
+  latitud: number;
+  longitud: number;
+  telefono_operativo: string;
+  horario_inicio: string;
+  horario_fin: string;
+}
+
+export interface OrgTecnico {
+  tecnico_id: number;
+  tecnico_nombre: string;
+  especialidad?: string;
+  disponible: boolean;
+  latitud_actual?: number;
+  longitud_actual?: number;
+  fecha_ultima_ubicacion?: string;
+  taller_id: number;
+  taller_nombre: string;
+}
+
+export interface OrgTecnicosResponse {
+  success: boolean;
+  organizacion_id: number;
+  total: number;
+  data: OrgTecnico[];
+}
+
+export interface OrgIncidente {
+  incidente_id: number;
+  estado_incidente: string;
+  tipo_problema?: string;
+  prioridad: string;
+  fecha_creacion: string;
+  cliente_nombre: string;
+  cliente_email?: string;
+  cliente_telefono?: string;
+  taller_id?: number;
+  taller_nombre?: string;
+  organizacion_id?: number;
+  asignacion_id?: number;
+  estado_asignacion?: string;
+  tecnico_id?: number;
+  tecnico_nombre?: string;
+  monto_total?: number;
+  estado_pago?: string;
+}
+
+export interface OrgIncidentesResponse {
+  success: boolean;
+  organizacion_id: number;
+  total: number;
+  limit: number;
+  offset: number;
+  data: OrgIncidente[];
+}
+
+export interface ReporteTaller {
+  taller_id: number;
+  razon_social: string;
+  total_transacciones: number;
+  ingresos_brutos: number;
+  ingresos_talleres: number;
+  comisiones: number;
+  pagos_completados: number;
+  pagos_pendientes: number;
+  calificacion_promedio: number;
+}
+
+export interface OrgReportesResponse {
+  success: boolean;
+  organizacion_id: number;
+  periodo: { desde?: string; hasta?: string };
+  resumen: {
+    total_ingresos: number;
+    total_comisiones: number;
+    ingresos_netos: number;
+  };
+  por_taller: ReporteTaller[];
+}

@@ -28,6 +28,9 @@ import {
   AuthErrorType,
   RolEnum,
   ApiErrorResponse,
+  OrgLoginResponse,
+  OrgRegisterRequest,
+  OrgRegisterResponse,
 } from '../models/auth.models';
 
 import { StorageService } from './storage.service';
@@ -41,7 +44,8 @@ export class AuthService {
   private storageService = inject(StorageService);
   private jwtService = inject(JwtService);
 
-  private apiUrl = `${environment.api.baseUrl}/api/taller`;
+  private apiUrl    = `${environment.api.baseUrl}/api/taller`;
+  private orgApiUrl = `${environment.api.baseUrl}/api/organizacion`;
 
   // Estado reactivo de autenticación
   private authState = new BehaviorSubject<AuthState>({
@@ -110,16 +114,21 @@ export class AuthService {
           throw new Error('No user data received from server');
         }
 
+        // Extraer rol del JWT para guardar en CurrentUser
+        const decoded = this.jwtService.decodeToken(token as string);
+
         // Crear objeto CurrentUser desde la respuesta
         const currentUser: CurrentUser = {
           usuario_id: user.usuario_id,
           nombre: user.nombre,
           email: user.email,
+          rol: decoded?.rol || 'taller',
           telefono: user.telefono,
           documento_identidad: user.documento_identidad,
           taller_id: user.taller_id || 0,
           razon_social: user.razon_social || '',
           rol_id: user.rol_id,
+          organizacion_id: decoded?.organizacion_id,
           direccion: user.direccion,
           telefono_operativo: user.telefono_operativo,
           horario_inicio: user.horario_inicio,
@@ -150,6 +159,75 @@ export class AuthService {
           type: errorType,
           message
         }));
+      })
+    );
+  }
+
+  /**
+   * LOGIN ORG: Autentica un tenant_admin
+   */
+  loginOrg(credentials: LoginRequest): Observable<OrgLoginResponse> {
+    this.setLoading(true);
+    this.clearError();
+
+    return this.http.post<OrgLoginResponse>(
+      `${this.orgApiUrl}/login`,
+      credentials,
+    ).pipe(
+      tap((response) => {
+        const token = response.access_token;
+        if (!token) throw new Error('No token received');
+
+        const orgUser = response.user;
+        const currentUser: CurrentUser = {
+          usuario_id: orgUser.usuario_id,
+          nombre: orgUser.nombre,
+          email: orgUser.email,
+          rol: orgUser.rol,
+          taller_id: 0,
+          razon_social: '',
+          rol_id: 0,
+          organizacion_id: orgUser.organizacion_id,
+          organizacion_nombre: orgUser.organizacion_nombre,
+        };
+
+        this.storageService.setToken(token);
+        this.storageService.setCurrentUser(currentUser);
+        this.authState.next({
+          isAuthenticated: true,
+          currentUser,
+          token,
+          loading: false,
+          error: null,
+        });
+      }),
+      finalize(() => this.setLoading(false)),
+      catchError((error) => {
+        this.setLoading(false);
+        const message = error?.error?.detail || 'Credenciales inválidas';
+        this.setError(message);
+        return throwError(() => ({ type: this.parseErrorType(error), message }));
+      })
+    );
+  }
+
+  /**
+   * REGISTER ORG: Registra una nueva organización
+   */
+  registerOrg(data: OrgRegisterRequest): Observable<OrgRegisterResponse> {
+    this.setLoading(true);
+    this.clearError();
+
+    return this.http.post<OrgRegisterResponse>(
+      `${this.orgApiUrl}/register`,
+      data,
+    ).pipe(
+      tap(() => this.setLoading(false)),
+      finalize(() => this.setLoading(false)),
+      catchError((error) => {
+        this.setLoading(false);
+        this.setError(error?.error?.detail || 'Error en el registro');
+        return throwError(() => ({ type: this.parseErrorType(error), message: error?.error?.detail || 'Error en el registro' }));
       })
     );
   }

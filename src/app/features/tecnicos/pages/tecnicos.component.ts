@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -24,6 +24,7 @@ export class TecnicosComponent implements OnInit, OnDestroy {
   private tecnicosService = inject(TecnicosService);
   private serviciosService = inject(ServiciosService);
   private fb = inject(FormBuilder);
+  private cdr = inject(ChangeDetectorRef);
   private destroy$ = new Subject<void>();
 
   tecnicos$ = this.tecnicosService.getTecnicos$();
@@ -186,7 +187,7 @@ export class TecnicosComponent implements OnInit, OnDestroy {
     clearTimeout(this.toastTimer);
     this.toastMsg = msg;
     this.toastType = type;
-    this.toastTimer = setTimeout(() => { this.toastMsg = ''; }, 4500);
+    this.toastTimer = setTimeout(() => { this.toastMsg = ''; this.cdr.markForCheck(); }, 4500);
   }
 
   ngOnDestroy() {

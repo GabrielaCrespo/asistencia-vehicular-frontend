@@ -97,7 +97,10 @@ export interface ApiErrorResponse {
  */
 export interface DecodedToken {
   sub: string;
-  taller_id: number;
+  taller_id?: number;
+  organizacion_id?: number;
+  rol?: string;
+  email?: string;
   exp: number;
   iat?: number;
 }
@@ -117,17 +120,20 @@ export interface AuthState {
 }
 
 /**
- * Usuario actual en sesión
+ * Usuario actual en sesión (taller o tenant_admin)
  */
 export interface CurrentUser {
   usuario_id: number;
   nombre: string;
   email: string;
+  rol: string;            // 'taller' | 'tenant_admin' | 'administrador'
+  taller_id: number;      // 0 para roles que no son taller
+  razon_social: string;   // vacío para roles que no son taller
+  rol_id: number;
+  organizacion_id?: number;       // para tenant_admin
+  organizacion_nombre?: string;   // para tenant_admin
   telefono?: string;
   documento_identidad?: string;
-  taller_id: number;
-  razon_social: string;
-  rol_id: number;
   direccion?: string;
   telefono_operativo?: string;
   horario_inicio?: string;
@@ -187,5 +193,43 @@ export enum AuthErrorType {
 export enum RolEnum {
   CLIENTE = 1,
   TALLER = 2,
-  ADMIN = 3
+  ADMIN = 3,
+  TENANT_ADMIN = 4
+}
+
+// ==================== ORG / TENANT ADMIN ====================
+
+export interface OrgAdminUser {
+  usuario_id: number;
+  nombre: string;
+  email: string;
+  rol: string;
+  organizacion_id: number;
+  organizacion_nombre: string;
+}
+
+export interface OrgLoginResponse {
+  success: boolean;
+  access_token: string;
+  user: OrgAdminUser;
+}
+
+export interface OrgRegisterRequest {
+  nombre_organizacion: string;
+  descripcion?: string;
+  nit?: string;
+  email_contacto: string;
+  telefono_organizacion?: string;
+  plan?: string;
+  nombre_admin: string;
+  email_admin: string;
+  password_admin: string;
+  telefono_admin?: string;
+}
+
+export interface OrgRegisterResponse {
+  success: boolean;
+  message: string;
+  organizacion_id: number;
+  usuario_id: number;
 }
