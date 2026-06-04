@@ -117,3 +117,78 @@ export interface OrgReportesResponse {
   };
   por_taller: ReporteTaller[];
 }
+
+// ── Analítica Operacional ────────────────────────────────────────────────────
+
+export interface TiemposPromedio {
+  promedio_asignacion_min: number | null;
+  promedio_llegada_min: number | null;
+  promedio_finalizacion_min: number | null;
+}
+
+export interface IncidentePorTipo {
+  tipo: string;
+  cantidad: number;
+}
+
+export interface ZonaTop {
+  lat: number;
+  lng: number;
+  cantidad: number;
+}
+
+export interface RankingTaller {
+  taller_id: number;
+  nombre: string;
+  completados: number;
+  total: number;
+  calificacion: number;
+  tiempo_prom_asignacion_min: number;
+  score: number;
+}
+
+export interface AnaliticaGlobal {
+  organizacion_id: number;
+  total_emergencias: number;
+  tiempos: TiemposPromedio;
+  casos_cancelados: number;
+  sla_cumplimiento_pct: number | null;
+  sla_total_evaluados: number;
+  incidentes_por_tipo: IncidentePorTipo[];
+  zonas_top: ZonaTop[];
+  ranking_talleres: RankingTaller[];
+}
+
+export interface MesMensual {
+  anio: number;
+  mes: number;
+  mes_nombre: string;
+  total: number;
+  completados: number;
+}
+
+export interface ComparacionTenant {
+  promedio_asignacion_min: number | null;
+  promedio_llegada_min: number | null;
+  promedio_finalizacion_min: number | null;
+  sla_cumplimiento_pct: number | null;
+}
+
+export interface TiemposTaller {
+  promedio_asignacion_min: number | null;
+  promedio_llegada_min: number | null;
+  promedio_resolucion_min: number | null;
+}
+
+export interface AnaliticaTaller {
+  taller_id: number;
+  taller_nombre: string;
+  total_emergencias: number;
+  casos_cancelados: number;
+  tiempos: TiemposTaller;
+  sla_cumplimiento_pct: number | null;
+  sla_total_evaluados: number;
+  incidentes_por_tipo: IncidentePorTipo[];
+  rendimiento_mensual: MesMensual[];
+  comparacion_tenant: ComparacionTenant;
+}

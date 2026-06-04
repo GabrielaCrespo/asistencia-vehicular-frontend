@@ -133,6 +133,16 @@ import { environment } from '../../environments/environment';
               <span>Reportes</span>
             </a>
 
+            <a routerLink="/organizacion/analitica" routerLinkActive="active"
+               class="nav-item" (click)="sidebarOpen = false">
+              <div class="nav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                </svg>
+              </div>
+              <span>Analítica</span>
+            </a>
+
           </nav>
         </aside>
 

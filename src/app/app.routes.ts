@@ -142,6 +142,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/organizacion/pages/org-reportes.component').then(m => m.OrgReportesComponent),
         data: { title: 'Reportes - Organización' }
       },
+      {
+        path: 'analitica',
+        loadComponent: () => import('./features/organizacion/pages/org-analitica.component').then(m => m.OrgAnaliticaComponent),
+        data: { title: 'Analítica Operacional - Organización' }
+      },
     ]
   },
 
