@@ -82,6 +82,14 @@ export const routes: Routes = [
     data: { title: 'Perfil del Taller' }
   },
 
+  // Ruta protegida: Monitoreo en tiempo real
+  {
+    path: 'monitoreo',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/monitoreo/monitoreo.component').then(m => m.MonitoreoComponent),
+    data: { title: 'Monitoreo Operacional' }
+  },
+
   // Ruta protegida: Notificaciones
   {
     path: 'notificaciones',
