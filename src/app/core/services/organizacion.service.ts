@@ -11,6 +11,8 @@ import {
   OrgTecnicosResponse,
   OrgIncidentesResponse,
   OrgReportesResponse,
+  AnaliticaGlobal,
+  AnaliticaTaller,
 } from '../models/organizacion.models';
 
 @Injectable({ providedIn: 'root' })
@@ -74,5 +76,13 @@ export class OrganizacionService {
     if (fechaHasta) params.push(`fecha_hasta=${fechaHasta}`);
     if (params.length) url += '?' + params.join('&');
     return this.cachedGet<OrgReportesResponse>(key, url);
+  }
+
+  getAnaliticaGlobal(orgId: number): Observable<AnaliticaGlobal> {
+    return this.http.get<AnaliticaGlobal>(`${this.base}/${orgId}/analitica`);
+  }
+
+  getAnaliticaTaller(orgId: number, tallerId: number): Observable<AnaliticaTaller> {
+    return this.http.get<AnaliticaTaller>(`${this.base}/${orgId}/analitica/taller/${tallerId}`);
   }
 }
