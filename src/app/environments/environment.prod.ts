@@ -17,7 +17,10 @@ export const environment = {
     routes: {
       login: '/auth/login',
       register: '/auth/register',
+      orgRegister: '/auth/org-register',
+      orgLogin: '/auth/login',
       dashboard: '/dashboard',
+      orgDashboard: '/organizacion/dashboard',
       logout: '/logout',
     }
   },

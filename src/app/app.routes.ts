@@ -14,6 +14,7 @@ import { serviciosRoutes } from './features/servicios/servicios.routes';
 import { solicitudesRoutes } from './features/solicitudes/solicitudes.routes';
 import { ingresosRoutes } from './features/ingresos/ingresos.routes';
 import { historialRoutes } from './features/historial/historial.routes';
+import { cotizacionesRoutes } from './features/cotizaciones/cotizaciones.routes';
 
 export const routes: Routes = [
   // LANDING PAGE / BIENVENIDA
@@ -72,6 +73,14 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: historialRoutes,
     data: { title: 'Historial del Taller' }
+  },
+
+  // Ruta protegida: Cotizaciones
+  {
+    path: 'cotizaciones',
+    canActivate: [authGuard],
+    children: cotizacionesRoutes,
+    data: { title: 'Cotizaciones' }
   },
 
   // Ruta protegida: Perfil del Taller
