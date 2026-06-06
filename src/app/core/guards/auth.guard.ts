@@ -30,9 +30,14 @@ export const authGuard: CanActivateFn = (
           queryParams: { returnUrl: state.url }
         });
       }
+      const rol = authState.currentUser?.rol;
       // Redirigir tenant_admin al portal de organización si intenta entrar al portal taller
-      if (authState.currentUser?.rol === 'tenant_admin') {
+      if (rol === 'tenant_admin') {
         return router.createUrlTree([environment.auth.routes.orgDashboard]);
+      }
+      // Redirigir administrador al portal de superadmin si intenta entrar al portal taller
+      if (rol === 'administrador') {
+        return router.createUrlTree([environment.auth.routes.superAdminDashboard]);
       }
       return true;
     })
@@ -55,7 +60,39 @@ export const orgGuard: CanActivateFn = (
       if (!authState.isAuthenticated) {
         return router.createUrlTree([environment.auth.routes.login]);
       }
+      const rol = authState.currentUser?.rol;
+      if (rol === 'administrador') {
+        return router.createUrlTree([environment.auth.routes.superAdminDashboard]);
+      }
       // Autenticado pero no es tenant_admin → redirigir a su dashboard
+      return router.createUrlTree([environment.auth.routes.dashboard]);
+    })
+  );
+};
+
+export const superAdminGuard: CanActivateFn = (
+  route: ActivatedRouteSnapshot,
+  state: RouterStateSnapshot
+): Observable<boolean | UrlTree> => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  return authService.auth$.pipe(
+    take(1),
+    map((authState) => {
+      if (authState.isAuthenticated && authState.currentUser?.rol === 'administrador') {
+        return true;
+      }
+      if (!authState.isAuthenticated) {
+        return router.createUrlTree([environment.auth.routes.login]);
+      }
+      const rol = authState.currentUser?.rol;
+      if (rol === 'tenant_admin') {
+        return router.createUrlTree([environment.auth.routes.orgDashboard]);
+      }
+      if (rol === 'administrador') {
+        return router.createUrlTree([environment.auth.routes.superAdminDashboard]);
+      }
       return router.createUrlTree([environment.auth.routes.dashboard]);
     })
   );
@@ -81,6 +118,9 @@ export const noAuthGuard: CanActivateFn = (
       const rol = authState.currentUser?.rol;
       if (rol === 'tenant_admin') {
         return router.createUrlTree([environment.auth.routes.orgDashboard]);
+      }
+      if (rol === 'administrador') {
+        return router.createUrlTree([environment.auth.routes.superAdminDashboard]);
       }
       return router.createUrlTree([environment.auth.routes.dashboard]);
     })

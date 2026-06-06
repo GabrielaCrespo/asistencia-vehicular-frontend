@@ -1,22 +1,22 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet, NavigationEnd } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, filter } from 'rxjs/operators';
 
 import { AuthService } from '../../core/auth/auth.service';
 import { CurrentUser } from '../../core/models/auth.models';
 import { environment } from '../../environments/environment';
 
 @Component({
-  selector: 'app-org-layout',
+  selector: 'app-superadmin-layout',
   standalone: true,
   imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
   template: `
-    <div class="org-shell">
+    <div class="sa-shell">
 
-      <!-- ══ TOPBAR (teal gradient, igual al dashboard de taller) ══ -->
+      <!-- TOPBAR -->
       <header class="topbar">
         <div class="topbar-inner">
 
@@ -25,22 +25,20 @@ import { environment } from '../../environments/environment';
                     [attr.aria-label]="sidebarOpen ? 'Cerrar menú' : 'Abrir menú'">
               <span></span><span></span><span></span>
             </button>
-            <a routerLink="/organizacion/dashboard" class="brand">
+            <a routerLink="/superadmin/dashboard" class="brand">
               <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                <rect x="2" y="7" width="20" height="14" rx="2"/>
-                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
               </svg>
-              <span class="brand-name">Asistencia Vehicular</span>
+              <span class="brand-name">Super Administración</span>
             </a>
           </div>
 
           <div class="topbar-center">
-            <span class="org-chip">
+            <span class="admin-chip">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="2" y="7" width="20" height="14" rx="2"/>
-                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
               </svg>
-              {{ currentUser?.organizacion_nombre || 'Organización' }}
+              Plataforma Global
             </span>
           </div>
 
@@ -62,17 +60,14 @@ import { environment } from '../../environments/environment';
         </div>
       </header>
 
-      <!-- ══ BODY ══ -->
+      <!-- BODY -->
       <div class="body">
-
-        <!-- Overlay móvil -->
         <div class="overlay" [class.visible]="sidebarOpen" (click)="sidebarOpen = false"></div>
 
-        <!-- Sidebar blanco con acentos teal -->
         <aside class="sidebar" [class.open]="sidebarOpen">
           <nav class="sidebar-nav">
 
-            <a routerLink="/organizacion/dashboard" routerLinkActive="active"
+            <a routerLink="/superadmin/dashboard" routerLinkActive="active"
                class="nav-item" (click)="sidebarOpen = false">
               <div class="nav-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -82,10 +77,21 @@ import { environment } from '../../environments/environment';
                   <rect x="14" y="14" width="7" height="7" rx="1"/>
                 </svg>
               </div>
-              <span>Dashboard</span>
+              <span>Dashboard Global</span>
             </a>
 
-            <a routerLink="/organizacion/talleres" routerLinkActive="active"
+            <a routerLink="/superadmin/organizaciones" routerLinkActive="active"
+               class="nav-item" (click)="sidebarOpen = false">
+              <div class="nav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="7" width="20" height="14" rx="2"/>
+                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                </svg>
+              </div>
+              <span>Organizaciones</span>
+            </a>
+
+            <a routerLink="/superadmin/talleres" routerLinkActive="active"
                class="nav-item" (click)="sidebarOpen = false">
               <div class="nav-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -96,7 +102,7 @@ import { environment } from '../../environments/environment';
               <span>Talleres</span>
             </a>
 
-            <a routerLink="/organizacion/tecnicos" routerLinkActive="active"
+            <a routerLink="/superadmin/usuarios" routerLinkActive="active"
                class="nav-item" (click)="sidebarOpen = false">
               <div class="nav-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -106,68 +112,57 @@ import { environment } from '../../environments/environment';
                   <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                 </svg>
               </div>
-              <span>Técnicos</span>
+              <span>Usuarios</span>
             </a>
 
-            <a routerLink="/organizacion/incidentes" routerLinkActive="active"
-               class="nav-item" (click)="sidebarOpen = false">
-              <div class="nav-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-                  <line x1="12" y1="9" x2="12" y2="13"/>
-                  <line x1="12" y1="17" x2="12.01" y2="17"/>
-                </svg>
-              </div>
-              <span>Incidentes</span>
-            </a>
-
-            <a routerLink="/organizacion/reportes" routerLinkActive="active"
-               class="nav-item" (click)="sidebarOpen = false">
-              <div class="nav-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <line x1="18" y1="20" x2="18" y2="10"/>
-                  <line x1="12" y1="20" x2="12" y2="4"/>
-                  <line x1="6" y1="20" x2="6" y2="14"/>
-                </svg>
-              </div>
-              <span>Reportes</span>
-            </a>
-
-            <a routerLink="/organizacion/analitica" routerLinkActive="active"
+            <a routerLink="/superadmin/kpis" routerLinkActive="active"
                class="nav-item" (click)="sidebarOpen = false">
               <div class="nav-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
                 </svg>
               </div>
-              <span>Analítica</span>
+              <span>KPIs Globales</span>
             </a>
 
-            <a routerLink="/organizacion/calificaciones" routerLinkActive="active"
+            <a routerLink="/superadmin/bitacora" routerLinkActive="active"
                class="nav-item" (click)="sidebarOpen = false">
               <div class="nav-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                  <line x1="16" y1="13" x2="8" y2="13"/>
+                  <line x1="16" y1="17" x2="8" y2="17"/>
+                  <polyline points="10 9 9 9 8 9"/>
                 </svg>
               </div>
-              <span>Calificaciones</span>
+              <span>Bitácora</span>
+            </a>
+
+            <a routerLink="/superadmin/configuracion" routerLinkActive="active"
+               class="nav-item" (click)="sidebarOpen = false">
+              <div class="nav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+              </div>
+              <span>Configuración</span>
             </a>
 
           </nav>
         </aside>
 
-        <!-- Contenido -->
         <main class="main">
-          <router-outlet></router-outlet>
+          <router-outlet (activate)="onRouteActivate()"></router-outlet>
         </main>
-
       </div>
     </div>
   `,
   styles: [`
     * { box-sizing: border-box; }
 
-    .org-shell {
+    .sa-shell {
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -175,10 +170,10 @@ import { environment } from '../../environments/environment';
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     }
 
-    /* ══ TOPBAR ══ */
+    /* TOPBAR */
     .topbar {
-      background: linear-gradient(135deg, #5cbdb9 0%, #3aa7a2 100%);
-      box-shadow: 0 2px 20px rgba(58,167,162,0.3);
+      background: linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%);
+      box-shadow: 0 2px 20px rgba(109,40,217,0.35);
       position: sticky;
       top: 0;
       z-index: 200;
@@ -194,7 +189,6 @@ import { environment } from '../../environments/environment';
       gap: 1rem;
     }
 
-    /* Left */
     .topbar-left { display: flex; align-items: center; gap: 0.75rem; }
 
     .hamburger {
@@ -207,34 +201,25 @@ import { environment } from '../../environments/environment';
       border: none; border-radius: 8px; cursor: pointer; padding: 6px;
       flex-shrink: 0;
     }
-    .hamburger span {
-      display: block; height: 2px; background: white; border-radius: 2px;
-      transition: all 0.2s;
-    }
+    .hamburger span { display: block; height: 2px; background: white; border-radius: 2px; }
 
     .brand {
       display: flex; align-items: center; gap: 0.5rem;
       text-decoration: none; color: white;
     }
-    .brand svg { width: 24px; height: 24px; flex-shrink: 0; }
-    .brand-name {
-      font-size: 1rem; font-weight: 700; letter-spacing: -0.2px;
-      white-space: nowrap;
-    }
+    .brand svg { width: 22px; height: 22px; flex-shrink: 0; }
+    .brand-name { font-size: 1rem; font-weight: 700; letter-spacing: -0.2px; white-space: nowrap; }
 
-    /* Center */
     .topbar-center { flex: 1; display: flex; justify-content: center; }
 
-    .org-chip {
+    .admin-chip {
       display: inline-flex; align-items: center; gap: 0.4rem;
-      background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
       color: white; border-radius: 99px;
       padding: 0.3rem 0.9rem; font-size: 0.82rem; font-weight: 600;
-      max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
-    .org-chip svg { width: 13px; height: 13px; flex-shrink: 0; }
+    .admin-chip svg { width: 13px; height: 13px; flex-shrink: 0; }
 
-    /* Right */
     .topbar-right { display: flex; align-items: center; gap: 0.75rem; }
 
     .user-pill {
@@ -242,14 +227,12 @@ import { environment } from '../../environments/environment';
       background: rgba(255,255,255,0.15); border-radius: 99px;
       padding: 0.25rem 0.75rem 0.25rem 0.3rem;
     }
-
     .user-avatar {
       width: 28px; height: 28px; border-radius: 50%;
       background: rgba(255,255,255,0.3); border: 1.5px solid rgba(255,255,255,0.5);
       color: white; font-size: 0.72rem; font-weight: 700;
       display: flex; align-items: center; justify-content: center;
     }
-
     .user-name { font-size: 0.82rem; font-weight: 600; color: white; }
 
     .btn-logout {
@@ -261,51 +244,32 @@ import { environment } from '../../environments/environment';
     .btn-logout svg { width: 15px; height: 15px; }
     .btn-logout:hover { background: rgba(255,255,255,0.22); }
 
-    /* ══ BODY ══ */
-    .body {
-      flex: 1;
-      display: flex;
-      position: relative;
-    }
+    /* BODY */
+    .body { flex: 1; display: flex; position: relative; }
 
-    /* ══ OVERLAY ══ */
     .overlay {
-      display: none;
-      position: fixed; inset: 0;
-      background: rgba(15,23,42,0.45);
-      z-index: 150;
+      display: none; position: fixed; inset: 0;
+      background: rgba(15,23,42,0.45); z-index: 150;
       opacity: 0; transition: opacity 0.25s;
     }
     .overlay.visible { opacity: 1; }
 
-    /* ══ SIDEBAR ══ */
+    /* SIDEBAR */
     .sidebar {
-      width: 220px;
-      min-width: 220px;
-      background: white;
-      border-right: 1px solid #e2e8f0;
-      position: sticky;
-      top: 60px;          /* altura del topbar */
-      height: calc(100vh - 60px);
-      overflow-y: auto;
-      flex-shrink: 0;
+      width: 220px; min-width: 220px;
+      background: white; border-right: 1px solid #e2e8f0;
+      position: sticky; top: 60px;
+      height: calc(100vh - 60px); overflow-y: auto; flex-shrink: 0;
     }
 
-    .sidebar-nav {
-      padding: 1rem 0.75rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.2rem;
-    }
+    .sidebar-nav { padding: 1rem 0.75rem; display: flex; flex-direction: column; gap: 0.2rem; }
 
     .nav-item {
       display: flex; align-items: center; gap: 0.75rem;
       padding: 0.65rem 0.9rem; border-radius: 10px;
       text-decoration: none; color: #64748b;
-      font-size: 0.875rem; font-weight: 500;
-      transition: all 0.18s ease;
+      font-size: 0.875rem; font-weight: 500; transition: all 0.18s ease;
     }
-
     .nav-icon {
       width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
@@ -313,51 +277,27 @@ import { environment } from '../../environments/environment';
     }
     .nav-icon svg { width: 17px; height: 17px; }
 
-    .nav-item:hover {
-      color: #5cbdb9;
-      background: #f0fdfa;
-    }
-    .nav-item:hover .nav-icon {
-      background: #ccfbf1;
-      color: #5cbdb9;
-    }
+    .nav-item:hover { color: #7c3aed; background: #f5f3ff; }
+    .nav-item:hover .nav-icon { background: #ede9fe; color: #7c3aed; }
 
-    .nav-item.active {
-      color: #5cbdb9;
-      background: #f0fdfa;
-      font-weight: 600;
-    }
-    .nav-item.active .nav-icon {
-      background: #5cbdb9;
-      color: white;
-    }
+    .nav-item.active { color: #7c3aed; background: #f5f3ff; font-weight: 600; }
+    .nav-item.active .nav-icon { background: #7c3aed; color: white; }
     .nav-item.active .nav-icon svg { stroke: white; }
 
-    /* ══ MAIN ══ */
-    .main {
-      flex: 1;
-      padding: 1.5rem;
-      overflow-x: hidden;
-      min-width: 0;
-    }
+    /* MAIN */
+    .main { flex: 1; padding: 1.5rem; overflow-x: hidden; min-width: 0; }
 
-    /* ══ RESPONSIVE ══ */
+    /* RESPONSIVE */
     @media (max-width: 768px) {
       .hamburger { display: flex; }
       .topbar-center { display: none; }
       .btn-logout-txt { display: none; }
       .user-name { display: none; }
-
       .sidebar {
-        position: fixed;
-        top: 0; left: 0; bottom: 0;
-        z-index: 160;
-        width: 260px;
-        min-width: 260px;
-        transform: translateX(-100%);
-        transition: transform 0.25s ease;
-        height: 100vh;
-        box-shadow: 4px 0 24px rgba(0,0,0,0.12);
+        position: fixed; top: 0; left: 0; bottom: 0;
+        z-index: 160; width: 260px; min-width: 260px;
+        transform: translateX(-100%); transition: transform 0.25s ease;
+        height: 100vh; box-shadow: 4px 0 24px rgba(0,0,0,0.12);
       }
       .sidebar.open { transform: translateX(0); }
       .overlay { display: block; }
@@ -365,10 +305,11 @@ import { environment } from '../../environments/environment';
     }
   `]
 })
-export class OrgLayoutComponent implements OnInit, OnDestroy {
+export class SuperAdminLayoutComponent implements OnInit, OnDestroy {
   private authService = inject(AuthService);
   private router      = inject(Router);
   private http        = inject(HttpClient);
+  private cdr         = inject(ChangeDetectorRef);
   private destroy$    = new Subject<void>();
 
   currentUser: CurrentUser | null = null;
@@ -377,16 +318,25 @@ export class OrgLayoutComponent implements OnInit, OnDestroy {
   private keepaliveInterval: ReturnType<typeof setInterval> | null = null;
 
   get initials(): string {
-    return (this.currentUser?.nombre || 'U').substring(0, 2).toUpperCase();
+    return (this.currentUser?.nombre || 'SA').substring(0, 2).toUpperCase();
   }
 
   ngOnInit(): void {
     this.authService.currentUser$()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(user => { this.currentUser = user; });
+      .subscribe(user => { this.currentUser = user; this.cdr.markForCheck(); });
+
+    // Force change detection after each navigation (required for zoneless mode)
+    this.router.events
+      .pipe(filter(e => e instanceof NavigationEnd), takeUntil(this.destroy$))
+      .subscribe(() => this.cdr.markForCheck());
 
     this.pingBackend();
     this.keepaliveInterval = setInterval(() => this.pingBackend(), 4 * 60 * 1000);
+  }
+
+  onRouteActivate(): void {
+    this.cdr.markForCheck();
   }
 
   private pingBackend(): void {

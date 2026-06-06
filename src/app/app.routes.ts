@@ -8,7 +8,7 @@
 import { Routes } from '@angular/router';
 import { WelcomeComponent } from './features/welcome/welcome.component';
 import { AUTH_ROUTES } from './features/auth/auth.routes';
-import { authGuard, orgGuard } from './core/guards/auth.guard';
+import { authGuard, orgGuard, superAdminGuard } from './core/guards/auth.guard';
 import { tecnicosRoutes } from './features/tecnicos/tecnicos.routes';
 import { serviciosRoutes } from './features/servicios/servicios.routes';
 import { solicitudesRoutes } from './features/solicitudes/solicitudes.routes';
@@ -146,6 +146,56 @@ export const routes: Routes = [
         path: 'analitica',
         loadComponent: () => import('./features/organizacion/pages/org-analitica.component').then(m => m.OrgAnaliticaComponent),
         data: { title: 'Analítica Operacional - Organización' }
+      },
+      {
+        path: 'calificaciones',
+        loadComponent: () => import('./features/organizacion/pages/org-calificaciones.component').then(m => m.OrgCalificacionesComponent),
+        data: { title: 'Calificaciones - Organización' }
+      },
+    ]
+  },
+
+  // Rutas del portal SuperAdministración (administrador)
+  {
+    path: 'superadmin',
+    canActivate: [superAdminGuard],
+    loadComponent: () => import('./features/superadmin/superadmin-layout.component').then(m => m.SuperAdminLayoutComponent),
+    children: [
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./features/superadmin/pages/sa-dashboard.component').then(m => m.SaDashboardComponent),
+        data: { title: 'Dashboard Global - SuperAdmin' }
+      },
+      {
+        path: 'organizaciones',
+        loadComponent: () => import('./features/superadmin/pages/sa-organizaciones.component').then(m => m.SaOrganizacionesComponent),
+        data: { title: 'Organizaciones - SuperAdmin' }
+      },
+      {
+        path: 'talleres',
+        loadComponent: () => import('./features/superadmin/pages/sa-talleres.component').then(m => m.SaTalleresComponent),
+        data: { title: 'Talleres - SuperAdmin' }
+      },
+      {
+        path: 'usuarios',
+        loadComponent: () => import('./features/superadmin/pages/sa-usuarios.component').then(m => m.SaUsuariosComponent),
+        data: { title: 'Usuarios - SuperAdmin' }
+      },
+      {
+        path: 'kpis',
+        loadComponent: () => import('./features/superadmin/pages/sa-kpis.component').then(m => m.SaKpisComponent),
+        data: { title: 'KPIs Globales - SuperAdmin' }
+      },
+      {
+        path: 'bitacora',
+        loadComponent: () => import('./features/superadmin/pages/sa-bitacora.component').then(m => m.SaBitacoraComponent),
+        data: { title: 'Bitácora - SuperAdmin' }
+      },
+      {
+        path: 'configuracion',
+        loadComponent: () => import('./features/superadmin/pages/sa-configuracion.component').then(m => m.SaConfiguracionComponent),
+        data: { title: 'Configuración - SuperAdmin' }
       },
     ]
   },

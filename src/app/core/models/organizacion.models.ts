@@ -147,6 +147,50 @@ export interface RankingTaller {
   score: number;
 }
 
+// ── Satisfacción y Valoraciones ─────────────────────────────────────────────
+
+export interface SatisfaccionTaller {
+  taller_id: number;
+  nombre: string;
+  promedio: number;
+  cantidad: number;
+}
+
+export interface DistribucionCalificacion {
+  estrellas: number;
+  cantidad: number;
+}
+
+export interface SatisfaccionGlobal {
+  promedio_tenant: number;
+  total_calificaciones: number;
+  pct_satisfaccion: number;
+  taller_mejor_valorado: SatisfaccionTaller | null;
+  top5_talleres: SatisfaccionTaller[];
+  distribucion: DistribucionCalificacion[];
+}
+
+export interface CalificacionItem {
+  calificacion_id: number;
+  puntuacion: number;
+  puntuacion_servicio?: number;
+  comentario?: string;
+  fecha_calificacion: string;
+  cliente_nombre: string;
+  tipo_problema?: string;
+  incidente_descripcion?: string;
+}
+
+export interface CalificacionesTallerResponse {
+  taller_id: number;
+  total: number;
+  promedio: number;
+  promedio_servicio: number;
+  limit: number;
+  offset: number;
+  data: CalificacionItem[];
+}
+
 export interface AnaliticaGlobal {
   organizacion_id: number;
   total_emergencias: number;
@@ -157,6 +201,7 @@ export interface AnaliticaGlobal {
   incidentes_por_tipo: IncidentePorTipo[];
   zonas_top: ZonaTop[];
   ranking_talleres: RankingTaller[];
+  satisfaccion?: SatisfaccionGlobal;
 }
 
 export interface MesMensual {

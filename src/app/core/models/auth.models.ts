@@ -197,6 +197,21 @@ export enum RolEnum {
   TENANT_ADMIN = 4
 }
 
+// ==================== SUPER ADMIN ====================
+
+export interface SuperAdminUser {
+  usuario_id: number;
+  nombre: string;
+  email: string;
+  rol: string;
+}
+
+export interface SuperAdminLoginResponse {
+  success: boolean;
+  access_token: string;
+  user: SuperAdminUser;
+}
+
 // ==================== ORG / TENANT ADMIN ====================
 
 export interface OrgAdminUser {

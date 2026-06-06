@@ -32,6 +32,7 @@ export const environment = {
       orgLogin: '/auth/login',
       dashboard: '/dashboard',
       orgDashboard: '/organizacion/dashboard',
+      superAdminDashboard: '/superadmin/dashboard',
       logout: '/logout',
     }
   },
