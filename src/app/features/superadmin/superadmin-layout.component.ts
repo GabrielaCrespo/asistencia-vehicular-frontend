@@ -115,15 +115,18 @@ import { environment } from '../../environments/environment';
               <span>Usuarios</span>
             </a>
 
-            <a routerLink="/superadmin/kpis" routerLinkActive="active"
+            <a routerLink="/superadmin/roles" routerLinkActive="active"
                class="nav-item" (click)="sidebarOpen = false">
               <div class="nav-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
                 </svg>
               </div>
-              <span>KPIs Globales</span>
+              <span>Roles y Permisos</span>
             </a>
+
+           
 
             <a routerLink="/superadmin/bitacora" routerLinkActive="active"
                class="nav-item" (click)="sidebarOpen = false">
@@ -153,15 +156,39 @@ import { environment } from '../../environments/environment';
               <span>Reportes</span>
             </a>
 
-            <a routerLink="/superadmin/configuracion" routerLinkActive="active"
+             <a routerLink="/superadmin/kpis" routerLinkActive="active"
                class="nav-item" (click)="sidebarOpen = false">
               <div class="nav-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="3"/>
-                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
                 </svg>
               </div>
-              <span>Configuración</span>
+              <span>KPIs Globales</span>
+            </a>
+
+            <a routerLink="/superadmin/backup" routerLinkActive="active"
+               class="nav-item" (click)="sidebarOpen = false">
+              <div class="nav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                  <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+                  <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+                  <polyline points="9 13 12 16 15 13"/>
+                  <line x1="12" y1="8" x2="12" y2="16"/>
+                </svg>
+              </div>
+              <span>Copias de Seguridad</span>
+            </a>
+
+            <a routerLink="/superadmin/suscripciones" routerLinkActive="active"
+               class="nav-item" (click)="sidebarOpen = false">
+              <div class="nav-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                  <line x1="1" y1="10" x2="23" y2="10"/>
+                </svg>
+              </div>
+              <span>Suscripciones</span>
             </a>
 
           </nav>

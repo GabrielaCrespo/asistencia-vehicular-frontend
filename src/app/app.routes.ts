@@ -173,6 +173,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/organizacion/pages/org-mapa-riesgo.component').then(m => m.OrgMapaRiesgoComponent),
         data: { title: 'Mapa de Riesgo - Organización' }
       },
+      {
+        path: 'suscripcion',
+        loadComponent: () => import('./features/organizacion/pages/org-suscripcion.component').then(m => m.OrgSuscripcionComponent),
+        data: { title: 'Suscripción - Organización' }
+      },
     ]
   },
 
@@ -214,15 +219,25 @@ export const routes: Routes = [
         data: { title: 'Bitácora - SuperAdmin' }
       },
       {
-        path: 'configuracion',
-        loadComponent: () => import('./features/superadmin/pages/sa-configuracion.component').then(m => m.SaConfiguracionComponent),
-        data: { title: 'Configuración - SuperAdmin' }
-      },
-      {
         path: 'reportes',
         loadComponent: () => import('./features/reportes/reportes-layout.component').then(m => m.ReportesLayoutComponent),
         children: reportesRoutes,
         data: { title: 'Reportes Globales - SuperAdmin' }
+      },
+      {
+        path: 'backup',
+        loadComponent: () => import('./features/superadmin/pages/sa-backup.component').then(m => m.SaBackupComponent),
+        data: { title: 'Copias de Seguridad - SuperAdmin' }
+      },
+      {
+        path: 'roles',
+        loadComponent: () => import('./features/superadmin/pages/sa-roles.component').then(m => m.SaRolesComponent),
+        data: { title: 'Roles y Permisos - SuperAdmin' }
+      },
+      {
+        path: 'suscripciones',
+        loadComponent: () => import('./features/superadmin/pages/sa-suscripciones.component').then(m => m.SaSuscripcionesComponent),
+        data: { title: 'Suscripciones SaaS - SuperAdmin' }
       },
     ]
   },
