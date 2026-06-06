@@ -21,7 +21,7 @@ import { LoginRequest } from '../../../../core/models/auth.models';
 import { environment } from '../../../../environments/environment';
 import { ThemeService } from '../../../../core/services/theme.service';
 
-type LoginMode = 'taller' | 'organizacion';
+type LoginMode = 'taller' | 'organizacion' | 'administrador';
 
 @Component({
   selector: 'app-login',
@@ -107,6 +107,12 @@ type LoginMode = 'taller' | 'organizacion';
               </svg>
               Organización
             </button>
+            <button type="button" class="mode-btn mode-btn--admin" [class.active]="loginMode === 'administrador'" (click)="setLoginMode('administrador')">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+              Admin
+            </button>
           </div>
 
           <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form" novalidate>
@@ -175,6 +181,7 @@ type LoginMode = 'taller' | 'organizacion';
           <div class="card-footer">
             <p *ngIf="loginMode === 'taller'">¿No tienes cuenta? <a routerLink="/auth/register">Registra tu taller</a></p>
             <p *ngIf="loginMode === 'organizacion'">¿Sin organización? <a routerLink="/auth/org-register">Crea tu organización</a></p>
+            <p *ngIf="loginMode === 'administrador'" class="admin-footer-note">Acceso exclusivo para SuperAdministradores de la plataforma.</p>
           </div>
 
         </div>
@@ -610,6 +617,23 @@ type LoginMode = 'taller' | 'organizacion';
 
     .mode-btn:hover:not(.active) { color: #5cbdb9; }
 
+    .mode-btn--admin:hover:not(.active) { color: #7c3aed; }
+    .mode-btn--admin.active {
+      background: white;
+      color: #7c3aed;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+    html.dark-theme .mode-btn--admin.active {
+      background: var(--bg2, #334155);
+      color: #a78bfa;
+    }
+
+    .admin-footer-note {
+      font-size: 0.82rem;
+      color: #7c3aed;
+      font-style: italic;
+    }
+
     /* Card footer */
     .card-footer {
       text-align: center;
@@ -734,7 +758,14 @@ export class LoginComponent implements OnInit, OnDestroy {
       password: this.loginForm.get('password')?.value
     };
 
-    if (this.loginMode === 'organizacion') {
+    if (this.loginMode === 'administrador') {
+      this.authService.loginSuperAdmin(credentials)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: () => this.router.navigate([environment.auth.routes.superAdminDashboard]),
+          error: (err) => console.error('SuperAdmin login error:', err)
+        });
+    } else if (this.loginMode === 'organizacion') {
       this.authService.loginOrg(credentials)
         .pipe(takeUntil(this.destroy$))
         .subscribe({

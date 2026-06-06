@@ -3,8 +3,9 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, take } from 'rxjs/operators';
 
 import { AuthService } from '../../../core/auth/auth.service';
 import { OrganizacionService } from '../../../core/services/organizacion.service';
@@ -181,7 +182,9 @@ const NO_DATA = 'No existen datos suficientes para calcular este KPI.';
           <ng-container *ngIf="global.zonas_top.length > 0; else noChart">
             <div class="bar-list">
               <div class="bar-row" *ngFor="let z of global.zonas_top; let i = index">
-                <span class="bar-label">Zona {{ i + 1 }} ({{ z.lat }}, {{ z.lng }})</span>
+                <span class="bar-label" [title]="z.lat + ', ' + z.lng">
+                  {{ zonaLabels[i] || ('Zona ' + (i + 1)) }}
+                </span>
                 <div class="bar-track">
                   <div class="bar-fill" [style.width.%]="barPct(z.cantidad, global.zonas_top[0].cantidad)"
                        style="background:#7c3aed"></div>
@@ -237,6 +240,144 @@ const NO_DATA = 'No existen datos suficientes para calcular este KPI.';
         </div>
 
       </div>
+
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <!-- SECCIÓN 2.5 – SATISFACCIÓN DEL CLIENTE                       -->
+      <!-- ══════════════════════════════════════════════════════════════ -->
+      <ng-container *ngIf="satisfaccion">
+
+        <h2 class="section-title" style="margin-top:2rem">
+          <span class="section-dot" style="background:#f59e0b"></span>
+          Satisfacción del cliente
+        </h2>
+
+        <!-- Sin valoraciones aún -->
+        <div class="center-state" *ngIf="satisfaccion.total_calificaciones === 0"
+             style="padding:1.5rem;background:white;border:1px solid #e2e8f0;border-radius:12px;margin-bottom:1.5rem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+          <p>Sin valoraciones registradas aún. Los clientes califican desde la app móvil.</p>
+        </div>
+
+        <!-- KPIs de satisfacción -->
+        <ng-container *ngIf="satisfaccion.total_calificaciones > 0">
+
+          <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr)">
+
+            <div class="kpi-card">
+              <div class="kpi-icon" style="background:#fefce8;color:#b45309;font-size:1.2rem">★</div>
+              <div class="kpi-data">
+                <span class="kpi-val" style="color:#b45309">{{ satisfaccion.promedio_tenant | number:'1.2-2' }}</span>
+                <span class="kpi-lbl">Promedio de satisfacción</span>
+              </div>
+            </div>
+
+            <div class="kpi-card"
+                 [class.kpi-good]="satisfaccion.pct_satisfaccion >= 80"
+                 [class.kpi-bad]="satisfaccion.pct_satisfaccion < 60">
+              <div class="kpi-icon"
+                   [style.background]="satisfaccion.pct_satisfaccion >= 80 ? '#f0fdf4' : '#fff7ed'"
+                   [style.color]="satisfaccion.pct_satisfaccion >= 80 ? '#16a34a' : '#ea580c'">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </div>
+              <div class="kpi-data">
+                <span class="kpi-val"
+                      [class.green]="satisfaccion.pct_satisfaccion >= 80"
+                      [class.red]="satisfaccion.pct_satisfaccion < 60">
+                  {{ satisfaccion.pct_satisfaccion | number:'1.0-0' }}%
+                </span>
+                <span class="kpi-lbl">% Satisfacción global</span>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-icon" style="background:#eff6ff;color:#3b82f6">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+              </div>
+              <div class="kpi-data">
+                <span class="kpi-val">{{ satisfaccion.total_calificaciones }}</span>
+                <span class="kpi-lbl">Valoraciones totales</span>
+              </div>
+            </div>
+
+            <div class="kpi-card" *ngIf="satisfaccion.taller_mejor_valorado">
+              <div class="kpi-icon" style="background:#fdf4ff;color:#9333ea">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+              </div>
+              <div class="kpi-data">
+                <span class="kpi-val" style="font-size:0.9rem;color:#9333ea;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                  {{ satisfaccion.taller_mejor_valorado.nombre }}
+                </span>
+                <span class="kpi-lbl">
+                  Mejor valorado · ★ {{ satisfaccion.taller_mejor_valorado.promedio | number:'1.1-1' }}
+                  ({{ satisfaccion.taller_mejor_valorado.cantidad }} reseñas)
+                </span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Gráficos de satisfacción -->
+          <div class="charts-grid" style="margin-bottom:1.5rem">
+
+            <!-- Top 5 talleres por calificación -->
+            <div class="chart-card">
+              <h3 class="chart-title">Top talleres por calificación</h3>
+              <div class="bar-list">
+                <div class="bar-row" *ngFor="let t of satisfaccion.top5_talleres; let i = index">
+                  <span class="bar-label">
+                    <ng-container [ngSwitch]="i">
+                      <ng-container *ngSwitchCase="0">🥇 </ng-container>
+                      <ng-container *ngSwitchCase="1">🥈 </ng-container>
+                      <ng-container *ngSwitchCase="2">🥉 </ng-container>
+                    </ng-container>
+                    {{ t.nombre }}
+                  </span>
+                  <div class="bar-track">
+                    <div class="bar-fill"
+                         [style.width.%]="barPct(t.promedio, 5)"
+                         style="background:#f59e0b"></div>
+                  </div>
+                  <span class="bar-count">
+                    <span class="star-badge">★ {{ t.promedio | number:'1.1-1' }}</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Distribución 1–5 estrellas -->
+            <div class="chart-card">
+              <h3 class="chart-title">Distribución de calificaciones</h3>
+              <div class="bar-list">
+                <div class="bar-row" *ngFor="let d of satisfaccion.distribucion">
+                  <span class="bar-label">
+                    <span class="distrib-stars">
+                      <span *ngFor="let s of starsRange(d.estrellas)" class="s-filled">★</span>
+                      <span *ngFor="let s of starsRange(5 - d.estrellas)" class="s-empty">★</span>
+                    </span>
+                  </span>
+                  <div class="bar-track">
+                    <div class="bar-fill"
+                         [style.width.%]="barPct(d.cantidad, maxDistrib)"
+                         style="background:#f59e0b"></div>
+                  </div>
+                  <span class="bar-count">{{ d.cantidad }}</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </ng-container>
+
+      </ng-container>
 
     </ng-container>
 
@@ -701,6 +842,11 @@ const NO_DATA = 'No existen datos suficientes para calcular este KPI.';
     /* ── No data ── */
     .no-data-msg { font-size: 0.82rem; color: #94a3b8; font-style: italic; margin: 0.5rem 0; }
 
+    /* ── Satisfaction distribution stars ── */
+    .distrib-stars { display: inline-flex; gap: 1px; font-size: 0.9rem; }
+    .s-filled { color: #f59e0b; }
+    .s-empty  { color: #d1d5db; }
+
     /* ── Responsive ── */
     @media (max-width: 1100px) {
       .kpi-grid { grid-template-columns: repeat(3, 1fr); }
@@ -724,6 +870,7 @@ export class OrgAnaliticaComponent implements OnInit, OnDestroy {
   private auth    = inject(AuthService);
   private orgSvc  = inject(OrganizacionService);
   private cdr     = inject(ChangeDetectorRef);
+  private http    = inject(HttpClient);
   private destroy$ = new Subject<void>();
 
   readonly noDataMsg = NO_DATA;
@@ -732,6 +879,9 @@ export class OrgAnaliticaComponent implements OnInit, OnDestroy {
   error         = '';
   loadingTaller = false;
   errorTaller   = '';
+
+  /** Etiquetas textuales para cada zona del gráfico "Zonas con más incidentes" */
+  zonaLabels: string[] = [];
 
   global:     AnaliticaGlobal | null = null;
   tallerData: AnaliticaTaller | null = null;
@@ -788,7 +938,11 @@ export class OrgAnaliticaComponent implements OnInit, OnDestroy {
         next: data => {
           this.global  = data;
           this.loading = false;
+          this.zonaLabels = [];
           this.cdr.markForCheck();
+          if (data.zonas_top?.length) {
+            this.loadZonaLabels(data.zonas_top);
+          }
         },
         error: err => {
           this.error   = err?.error?.detail ?? 'Error cargando analítica global.';
@@ -829,6 +983,35 @@ export class OrgAnaliticaComponent implements OnInit, OnDestroy {
       });
   }
 
+  // ── Reverse geocoding ────────────────────────────────────────────
+
+  private loadZonaLabels(zonas: { lat: number; lng: number }[]): void {
+    zonas.forEach((z, i) => {
+      // Nominatim permite 1 req/seg — espaciamos las llamadas
+      setTimeout(() => {
+        this.http.get<any>(
+          `https://nominatim.openstreetmap.org/reverse?lat=${z.lat}&lon=${z.lng}&format=json&accept-language=es`,
+          { headers: { 'Accept-Language': 'es' } }
+        ).pipe(take(1)).subscribe({
+          next: (res) => {
+            const a = res.address ?? {};
+            const sector  = a.suburb ?? a.neighbourhood ?? a.city_district ?? a.quarter ?? a.residential ?? a.road ?? '';
+            const ciudad  = a.city ?? a.town ?? a.municipality ?? a.county ?? '';
+            const partes  = [sector, ciudad].filter(Boolean);
+            this.zonaLabels[i] = partes.length
+              ? partes.join(', ')
+              : (res.display_name?.split(',').slice(0, 2).join(',').trim() ?? `Zona ${i + 1}`);
+            this.cdr.markForCheck();
+          },
+          error: () => {
+            this.zonaLabels[i] = `Zona ${i + 1}`;
+            this.cdr.markForCheck();
+          }
+        });
+      }, i * 1200);
+    });
+  }
+
   // ── Chart helpers ────────────────────────────────────────────────
 
   barPct(val: number, max: number): number {
@@ -850,5 +1033,19 @@ export class OrgAnaliticaComponent implements OnInit, OnDestroy {
   compWidth(taller: number | null, tenant: number | null): number {
     if (taller === null || tenant === null || tenant === 0) return 0;
     return Math.min(Math.round((taller / (tenant * 1.5)) * 100), 100);
+  }
+
+  // ── Satisfacción helpers ─────────────────────────────────────────
+
+  get satisfaccion() {
+    return this.global?.satisfaccion ?? null;
+  }
+
+  get maxDistrib(): number {
+    return Math.max(...(this.satisfaccion?.distribucion ?? []).map(d => d.cantidad), 1);
+  }
+
+  starsRange(n: number): number[] {
+    return Array.from({ length: Math.max(0, n) }, (_, i) => i + 1);
   }
 }

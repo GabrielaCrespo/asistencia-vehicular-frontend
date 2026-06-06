@@ -31,6 +31,7 @@ import {
   OrgLoginResponse,
   OrgRegisterRequest,
   OrgRegisterResponse,
+  SuperAdminLoginResponse,
 } from '../models/auth.models';
 
 import { StorageService } from './storage.service';
@@ -44,8 +45,9 @@ export class AuthService {
   private storageService = inject(StorageService);
   private jwtService = inject(JwtService);
 
-  private apiUrl    = `${environment.api.baseUrl}/api/taller`;
-  private orgApiUrl = `${environment.api.baseUrl}/api/organizacion`;
+  private apiUrl      = `${environment.api.baseUrl}/api/taller`;
+  private orgApiUrl   = `${environment.api.baseUrl}/api/organizacion`;
+  private adminApiUrl = `${environment.api.baseUrl}/api/superadmin`;
 
   // Estado reactivo de autenticación
   private authState = new BehaviorSubject<AuthState>({
@@ -189,6 +191,53 @@ export class AuthService {
           rol_id: 0,
           organizacion_id: orgUser.organizacion_id,
           organizacion_nombre: orgUser.organizacion_nombre,
+        };
+
+        this.storageService.setToken(token);
+        this.storageService.setCurrentUser(currentUser);
+        this.authState.next({
+          isAuthenticated: true,
+          currentUser,
+          token,
+          loading: false,
+          error: null,
+        });
+      }),
+      finalize(() => this.setLoading(false)),
+      catchError((error) => {
+        this.setLoading(false);
+        const message = error?.error?.detail || 'Credenciales inválidas';
+        this.setError(message);
+        return throwError(() => ({ type: this.parseErrorType(error), message }));
+      })
+    );
+  }
+
+  /**
+   * LOGIN SUPERADMIN: Autentica al SuperAdministrador
+   */
+  loginSuperAdmin(credentials: LoginRequest): Observable<SuperAdminLoginResponse> {
+    this.setLoading(true);
+    this.clearError();
+
+    return this.http.post<SuperAdminLoginResponse>(
+      `${this.adminApiUrl}/login`,
+      credentials,
+    ).pipe(
+      tap((response) => {
+        const token = response.access_token;
+        if (!token) throw new Error('No token received');
+
+        const adminUser = response.user;
+        const currentUser: CurrentUser = {
+          usuario_id: adminUser.usuario_id,
+          nombre: adminUser.nombre,
+          email: adminUser.email,
+          rol: adminUser.rol,
+          taller_id: 0,
+          razon_social: '',
+          rol_id: 0,
+          organizacion_id: undefined,
         };
 
         this.storageService.setToken(token);
