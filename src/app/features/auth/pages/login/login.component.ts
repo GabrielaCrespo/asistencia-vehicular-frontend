@@ -15,18 +15,20 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { HttpClientModule } from '@angular/common/http';
 
 import { AuthService } from '../../../../core/auth/auth.service';
 import { LoginRequest } from '../../../../core/models/auth.models';
 import { environment } from '../../../../environments/environment';
 import { ThemeService } from '../../../../core/services/theme.service';
+import { PushNotificationService } from '../../../../core/services/push-notification.service';
 
 type LoginMode = 'taller' | 'organizacion';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, HttpClientModule],
   template: `
     <div class="auth-page">
 
@@ -311,9 +313,7 @@ type LoginMode = 'taller' | 'organizacion';
       transition: background 0.22s ease;
     }
 
-    html.dark-theme .form-panel {
-      background: var(--bg, #0f172a);
-    }
+    html.dark-theme .form-panel { background: var(--bg, #0f172a); }
 
     .back-link {
       align-self: flex-start;
@@ -328,12 +328,8 @@ type LoginMode = 'taller' | 'organizacion';
       transition: color 0.2s, gap 0.2s;
     }
 
-    .back-link:hover {
-      color: #5cbdb9;
-      gap: 0.65rem;
-    }
+    .back-link:hover { color: #5cbdb9; gap: 0.65rem; }
 
-    /* ══ FORM CARD ══ */
     .form-card {
       width: 100%;
       max-width: 460px;
@@ -355,9 +351,7 @@ type LoginMode = 'taller' | 'organizacion';
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    .card-header {
-      margin-bottom: 1.5rem;
-    }
+    .card-header { margin-bottom: 1.5rem; }
 
     .card-header h2 {
       font-size: 1.6rem;
@@ -377,39 +371,9 @@ type LoginMode = 'taller' | 'organizacion';
 
     html.dark-theme .card-header p { color: var(--txt2, #94a3b8); }
 
-    /* Demo box */
-    .demo-box {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.6rem;
-      background: #fefce8;
-      border: 1px solid #fde68a;
-      color: #92400e;
-      border-radius: 10px;
-      padding: 0.8rem 1rem;
-      font-size: 0.82rem;
-      line-height: 1.5;
-      margin-bottom: 1.5rem;
-    }
+    .login-form { display: flex; flex-direction: column; gap: 0; }
 
-    html.dark-theme .demo-box {
-      background: rgba(234,179,8,0.08);
-      border-color: rgba(234,179,8,0.25);
-      color: #fde68a;
-    }
-
-    .demo-box svg { flex-shrink: 0; margin-top: 1px; }
-
-    /* ══ FORM ══ */
-    .login-form {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
-
-    .field-group {
-      margin-bottom: 1.1rem;
-    }
+    .field-group { margin-bottom: 1.1rem; }
 
     .field-label {
       display: block;
@@ -423,15 +387,10 @@ type LoginMode = 'taller' | 'organizacion';
 
     html.dark-theme .field-label { color: var(--txt2, #94a3b8); }
 
-    .input-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
+    .input-wrapper { position: relative; display: flex; align-items: center; }
 
     .input-icon {
-      position: absolute;
-      left: 0.875rem;
+      position: absolute; left: 0.875rem;
       width: 16px; height: 16px;
       color: var(--txt3, #94a3b8);
       pointer-events: none;
@@ -469,11 +428,7 @@ type LoginMode = 'taller' | 'organizacion';
     html.dark-theme .field-input:focus { background: var(--bg2, #1e293b); }
 
     .input-wrapper:focus-within .input-icon { color: #5cbdb9; }
-
-    .input-wrapper.has-error .field-input {
-      border-color: #ef4444;
-    }
-
+    .input-wrapper.has-error .field-input { border-color: #ef4444; }
     .input-wrapper.has-error .input-icon { color: #ef4444; }
 
     .field-error {
@@ -483,7 +438,6 @@ type LoginMode = 'taller' | 'organizacion';
       margin-top: 0.3rem;
     }
 
-    /* Toggle eye */
     .toggle-eye {
       position: absolute; right: 0.75rem;
       background: none; border: none; cursor: pointer;
@@ -494,13 +448,8 @@ type LoginMode = 'taller' | 'organizacion';
     }
 
     .toggle-eye svg { width: 16px; height: 16px; }
+    .toggle-eye:hover { color: #5cbdb9; background: rgba(92,189,185,0.1); }
 
-    .toggle-eye:hover {
-      color: #5cbdb9;
-      background: rgba(92,189,185,0.1);
-    }
-
-    /* Alert */
     .alert {
       display: flex; align-items: flex-start; gap: 0.55rem;
       padding: 0.8rem 0.95rem;
@@ -524,7 +473,6 @@ type LoginMode = 'taller' | 'organizacion';
       color: #fca5a5;
     }
 
-    /* Submit button */
     .btn-submit {
       width: 100%;
       display: inline-flex;
@@ -550,11 +498,7 @@ type LoginMode = 'taller' | 'organizacion';
       box-shadow: 0 8px 28px rgba(92,189,185,0.48);
     }
 
-    .btn-submit:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-      transform: none;
-    }
+    .btn-submit:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
 
     .spinner {
       display: inline-block;
@@ -568,7 +512,6 @@ type LoginMode = 'taller' | 'organizacion';
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ══ MODE TOGGLE ══ */
     .mode-toggle {
       display: flex;
       gap: 0.5rem;
@@ -610,7 +553,6 @@ type LoginMode = 'taller' | 'organizacion';
 
     .mode-btn:hover:not(.active) { color: #5cbdb9; }
 
-    /* Card footer */
     .card-footer {
       text-align: center;
       margin-top: 1.25rem;
@@ -634,26 +576,12 @@ type LoginMode = 'taller' | 'organizacion';
 
     .card-footer a:hover { color: #3aa7a2; text-decoration: underline; }
 
-    /* ══ RESPONSIVE ══ */
     @media (max-width: 900px) {
       .auth-page { grid-template-columns: 1fr; }
-
-      .brand-panel {
-        position: static;
-        height: auto;
-        padding: 2rem 1.5rem 2.5rem;
-      }
-
-      .brand-inner {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-      }
-
+      .brand-panel { position: static; height: auto; padding: 2rem 1.5rem 2.5rem; }
+      .brand-inner { display: flex; flex-direction: column; align-items: center; text-align: center; }
       .brand-feats li { justify-content: center; }
       .brand-h1 { font-size: 1.6rem; }
-
       .form-panel { padding: 1.5rem 1rem 3rem; }
       .form-card { padding: 2rem 1.5rem; }
     }
@@ -665,22 +593,18 @@ type LoginMode = 'taller' | 'organizacion';
   `]
 })
 export class LoginComponent implements OnInit, OnDestroy {
-  // Inyección de dependencias
   private authService = inject(AuthService);
   private formBuilder = inject(FormBuilder);
   private router = inject(Router);
   protected themeService = inject(ThemeService);
+  private pushNotificationService = inject(PushNotificationService);
 
-  // Formulario
   loginForm!: FormGroup;
-
-  // Estado
   isLoading = false;
   errorMessage = '';
   showPassword = false;
   loginMode: LoginMode = 'taller';
 
-  // Limpieza de suscripciones
   private destroy$ = new Subject<void>();
 
   ngOnInit(): void {
@@ -688,9 +612,6 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.subscribeToAuthState();
   }
 
-  /**
-   * Inicializa el formulario reactivo
-   */
   private initializeForm(): void {
     this.loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
@@ -698,21 +619,14 @@ export class LoginComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * Se suscribe al estado de autenticación
-   */
   private subscribeToAuthState(): void {
     this.authService.loading$()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(loading => {
-        this.isLoading = loading;
-      });
+      .subscribe(loading => { this.isLoading = loading; });
 
     this.authService.error$()
       .pipe(takeUntil(this.destroy$))
-      .subscribe(error => {
-        this.errorMessage = error || '';
-      });
+      .subscribe(error => { this.errorMessage = error || ''; });
   }
 
   setLoginMode(mode: LoginMode): void {
@@ -720,9 +634,6 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.errorMessage = '';
   }
 
-  /**
-   * Envía el formulario de login (taller o tenant_admin según modo)
-   */
   onSubmit(): void {
     if (this.loginForm.invalid) {
       this.markFormGroupTouched(this.loginForm);
@@ -738,76 +649,58 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.authService.loginOrg(credentials)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: () => this.router.navigate([environment.auth.routes.orgDashboard]),
+          next: () => {
+            // Inicializar notificaciones push web
+            this.pushNotificationService.inicializar();
+            this.router.navigate([environment.auth.routes.orgDashboard]);
+          },
           error: (err) => console.error('Org login error:', err)
         });
     } else {
       this.authService.login(credentials)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: () => this.router.navigate([environment.auth.routes.dashboard]),
+          next: () => {
+            // Inicializar notificaciones push web
+            this.pushNotificationService.inicializar();
+            this.router.navigate([environment.auth.routes.dashboard]);
+          },
           error: (err) => console.error('Login error:', err)
         });
     }
   }
 
-  /**
-   * Toggle para mostrar/ocultar contraseña
-   */
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }
 
-  /**
-   * Marca todos los campos como touched para mostrar errores
-   */
   private markFormGroupTouched(formGroup: FormGroup): void {
     Object.keys(formGroup.controls).forEach(key => {
       const control = formGroup.get(key);
       control?.markAsTouched();
-
       if (control instanceof FormGroup) {
         this.markFormGroupTouched(control);
       }
     });
   }
 
-  /**
-   * Getters para el template
-   */
-  get emailControl() {
-    return this.loginForm.get('email');
-  }
-
-  get passwordControl() {
-    return this.loginForm.get('password');
-  }
+  get emailControl() { return this.loginForm.get('email'); }
+  get passwordControl() { return this.loginForm.get('password'); }
 
   get emailError(): string {
     const control = this.emailControl;
-    if (control?.hasError('required')) {
-      return 'El email es requerido';
-    }
-    if (control?.hasError('email')) {
-      return 'Ingresa un email válido';
-    }
+    if (control?.hasError('required')) return 'El email es requerido';
+    if (control?.hasError('email')) return 'Ingresa un email válido';
     return '';
   }
 
   get passwordError(): string {
     const control = this.passwordControl;
-    if (control?.hasError('required')) {
-      return 'La contraseña es requerida';
-    }
-    if (control?.hasError('minlength')) {
-      return 'La contraseña debe tener al menos 6 caracteres';
-    }
+    if (control?.hasError('required')) return 'La contraseña es requerida';
+    if (control?.hasError('minlength')) return 'La contraseña debe tener al menos 6 caracteres';
     return '';
   }
 
-  /**
-   * Verifica si un campo es inválido y está marcado como touched
-   */
   isFieldInvalid(fieldName: string): boolean {
     const field = this.loginForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
