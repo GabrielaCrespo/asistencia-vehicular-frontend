@@ -173,8 +173,17 @@ const EJEMPLOS = [
     </div>
   `,
   styles: [`
-    .page { max-width: 1000px; }
-    .page-header { margin-bottom: 1.25rem; }
+    * { box-sizing: border-box; }
+    :host {
+      display: block;
+      width: 100%;
+      max-width: 1100px;
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+    }
+    .page { display: flex; flex-direction: column; gap: 1.25rem; padding-bottom: 2rem; }
+    .page-header { margin-bottom: 0; }
     .page-title { font-size: 1.5rem; font-weight: 800; color: #0f172a; margin: 0 0 0.2rem; }
     .page-sub { font-size: 0.875rem; color: #64748b; margin: 0; }
 
