@@ -152,6 +152,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/organizacion/pages/org-calificaciones.component').then(m => m.OrgCalificacionesComponent),
         data: { title: 'Calificaciones - Organización' }
       },
+      {
+        path: 'mapa-riesgo',
+        loadComponent: () => import('./features/organizacion/pages/org-mapa-riesgo.component').then(m => m.OrgMapaRiesgoComponent),
+        data: { title: 'Mapa de Riesgo - Organización' }
+      },
     ]
   },
 
