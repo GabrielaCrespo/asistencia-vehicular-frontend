@@ -79,7 +79,7 @@
           </div>
           <div>
             <p class="stat-label">Servicios completados</p>
-            <p class="stat-val">{{ loadingStats ? '…' : (historialResumen?.solicitudes_completadas ?? '—') }}</p>
+            <p class="stat-val">{{ loadingStats ? '…' : (stats?.servicios_completados ?? '—') }}</p>
           </div>
         </div>
         <div class="stat-card">
@@ -90,7 +90,7 @@
           </div>
           <div>
             <p class="stat-label">Solicitudes activas</p>
-            <p class="stat-val">{{ loadingStats ? '…' : historialResumen == null ? '—' : (historialResumen.solicitudes_pendientes + historialResumen.solicitudes_en_curso) }}</p>
+            <p class="stat-val">{{ loadingStats ? '…' : (stats?.solicitudes_activas ?? '—') }}</p>
           </div>
         </div>
         <div class="stat-card">
@@ -101,7 +101,7 @@
           </div>
           <div>
             <p class="stat-label">Calificación promedio</p>
-            <p class="stat-val">{{ loadingStats ? '…' : formatRating(historialResumen?.calificacion_promedio) }}</p>
+            <p class="stat-val">{{ loadingStats ? '…' : formatRating(stats?.calificacion_promedio) }}</p>
           </div>
         </div>
         <div class="stat-card">
@@ -112,7 +112,7 @@
           </div>
           <div>
             <p class="stat-label">Ingresos netos</p>
-            <p class="stat-val stat-val-money">{{ loadingStats ? '…' : formatMoney(ingresosResumen?.total_ingresos) }}</p>
+            <p class="stat-val stat-val-money">{{ loadingStats ? '…' : formatMoney(stats?.ingresos_netos) }}</p>
           </div>
         </div>
       </div>

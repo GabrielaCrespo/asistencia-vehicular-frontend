@@ -176,8 +176,7 @@ export class IngresosComponent implements OnInit, OnDestroy, AfterViewChecked {
         next: (res) => {
           this.cerrarConfirmPago();
           this.mostrarToast(res.message, 'ok');
-          this.ingresosService.cargarResumen(this.currentUser!.taller_id)
-            .pipe(takeUntil(this.destroy$)).subscribe();
+          this.cargarTodo(this.currentUser!.taller_id);
         },
         error: (e) => {
           this.procesandoPago = false;

@@ -237,3 +237,77 @@ export interface AnaliticaTaller {
   rendimiento_mensual: MesMensual[];
   comparacion_tenant: ComparacionTenant;
 }
+
+// ── Mapa Inteligente de Riesgo Vehicular (CU28) ─────────────────────────────
+
+export interface PuntoCalor {
+  lat: number;
+  lng: number;
+  cantidad: number;
+  intensidad: number;
+  nivel: 'bajo' | 'medio' | 'alto';
+}
+
+export interface ZonaPeligrosa {
+  nombre: string;
+  lat: number;
+  lng: number;
+  cantidad: number;
+  nivel_riesgo: 'bajo' | 'medio' | 'alto';
+  tiempo_prom_atencion_min: number | null;
+  geocoding?: string;
+}
+
+export interface TipoIncidenteMapa {
+  tipo: string;
+  cantidad: number;
+  porcentaje: number;
+}
+
+export interface PuntoHora {
+  hora: number;
+  cantidad: number;
+}
+
+export interface PuntoDia {
+  dia: number;
+  nombre_dia: string;
+  cantidad: number;
+}
+
+export interface HorariosCriticos {
+  por_hora: PuntoHora[];
+  por_dia: PuntoDia[];
+}
+
+export interface KpisGeograficos {
+  total_emergencias: number;
+  zona_mayor_riesgo: ZonaPeligrosa | null;
+  tipo_mas_frecuente: TipoIncidenteMapa | null;
+  horario_mayor_incidencia: PuntoHora | null;
+  tiempo_promedio_atencion_min: number | null;
+}
+
+export interface TallerFiltro {
+  taller_id: number;
+  razon_social: string;
+}
+
+export interface MapaRiesgoResponse {
+  organizacion_id: number;
+  total_emergencias: number;
+  puntos_calor: PuntoCalor[];
+  zonas_peligrosas: ZonaPeligrosa[];
+  tipos_incidente: TipoIncidenteMapa[];
+  horarios_criticos: HorariosCriticos;
+  kpis: KpisGeograficos;
+  talleres: TallerFiltro[];
+}
+
+export interface MapaRiesgoFiltros {
+  fecha_desde?: string;
+  fecha_hasta?: string;
+  tipo_problema?: string;
+  taller_id?: number;
+  estado?: string;
+}

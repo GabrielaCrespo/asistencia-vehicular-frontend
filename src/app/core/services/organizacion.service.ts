@@ -13,6 +13,8 @@ import {
   OrgReportesResponse,
   AnaliticaGlobal,
   AnaliticaTaller,
+  MapaRiesgoResponse,
+  MapaRiesgoFiltros,
 } from '../models/organizacion.models';
 
 @Injectable({ providedIn: 'root' })
@@ -84,5 +86,16 @@ export class OrganizacionService {
 
   getAnaliticaTaller(orgId: number, tallerId: number): Observable<AnaliticaTaller> {
     return this.http.get<AnaliticaTaller>(`${this.base}/${orgId}/analitica/taller/${tallerId}`);
+  }
+
+  getMapaRiesgo(orgId: number, filtros: MapaRiesgoFiltros = {}): Observable<MapaRiesgoResponse> {
+    const params: string[] = [];
+    if (filtros.fecha_desde) params.push(`fecha_desde=${filtros.fecha_desde}`);
+    if (filtros.fecha_hasta) params.push(`fecha_hasta=${filtros.fecha_hasta}`);
+    if (filtros.tipo_problema) params.push(`tipo_problema=${filtros.tipo_problema}`);
+    if (filtros.taller_id) params.push(`taller_id=${filtros.taller_id}`);
+    if (filtros.estado) params.push(`estado=${filtros.estado}`);
+    const qs = params.length ? `?${params.join('&')}` : '';
+    return this.http.get<MapaRiesgoResponse>(`${this.base}/${orgId}/mapa-riesgo${qs}`);
   }
 }
