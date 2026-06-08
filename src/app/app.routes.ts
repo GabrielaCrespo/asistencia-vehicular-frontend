@@ -15,6 +15,7 @@ import { solicitudesRoutes } from './features/solicitudes/solicitudes.routes';
 import { ingresosRoutes } from './features/ingresos/ingresos.routes';
 import { historialRoutes } from './features/historial/historial.routes';
 import { cotizacionesRoutes } from './features/cotizaciones/cotizaciones.routes';
+import { reportesRoutes } from './features/reportes/reportes.routes';
 
 export const routes: Routes = [
   // LANDING PAGE / BIENVENIDA
@@ -99,6 +100,15 @@ export const routes: Routes = [
     data: { title: 'Monitoreo Operacional' }
   },
 
+  // Ruta protegida: Reportes (taller)
+  {
+    path: 'reportes',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/reportes/reportes-layout.component').then(m => m.ReportesLayoutComponent),
+    children: reportesRoutes,
+    data: { title: 'Reportes' }
+  },
+
   // Ruta protegida: Notificaciones
   {
     path: 'notificaciones',
@@ -140,7 +150,13 @@ export const routes: Routes = [
       {
         path: 'reportes',
         loadComponent: () => import('./features/organizacion/pages/org-reportes.component').then(m => m.OrgReportesComponent),
-        data: { title: 'Reportes - Organización' }
+        data: { title: 'Reportes Financieros - Organización' }
+      },
+      {
+        path: 'reportes-avanzados',
+        loadComponent: () => import('./features/reportes/reportes-layout.component').then(m => m.ReportesLayoutComponent),
+        children: reportesRoutes,
+        data: { title: 'Reportes Avanzados - Organización' }
       },
       {
         path: 'analitica',
@@ -201,6 +217,12 @@ export const routes: Routes = [
         path: 'configuracion',
         loadComponent: () => import('./features/superadmin/pages/sa-configuracion.component').then(m => m.SaConfiguracionComponent),
         data: { title: 'Configuración - SuperAdmin' }
+      },
+      {
+        path: 'reportes',
+        loadComponent: () => import('./features/reportes/reportes-layout.component').then(m => m.ReportesLayoutComponent),
+        children: reportesRoutes,
+        data: { title: 'Reportes Globales - SuperAdmin' }
       },
     ]
   },

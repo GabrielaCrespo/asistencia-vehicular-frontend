@@ -147,20 +147,18 @@ export class IngresosComponent implements OnInit, OnDestroy, AfterViewChecked {
     if (!this.currentUser || !this.pagoSeleccionado) return;
 
     if (this.metodoPagoSeleccionado === 'stripe') {
-      if (!this.stripeClientSecret) return;
+      if (!this.stripeClientSecret || !this.pagoSeleccionado) return;
       this.procesandoPago = true;
       this.stripeError = null;
       try {
-        await this.stripeService.confirmCardPayment(this.stripeClientSecret);
+        const paymentIntentId = await this.stripeService.confirmCardPayment(this.stripeClientSecret);
+        await this.stripeService.verificarPago(this.pagoSeleccionado.pago_id, paymentIntentId, 'comision');
         this.cerrarConfirmPago();
-        this.mostrarToast('Pago con tarjeta procesado. La comisión quedará registrada en breve.', 'ok');
-        // Dar tiempo al webhook para actualizar y recargar
-        setTimeout(() => {
-          this.cargarTodo(this.currentUser!.taller_id);
-          this.cdr.markForCheck();
-        }, 3000);
+        this.mostrarToast('Comisión pagada correctamente', 'ok');
+        this.cargarTodo(this.currentUser!.taller_id);
+        this.cdr.markForCheck();
       } catch (e: any) {
-        this.stripeError = e?.message ?? 'Error al procesar el pago con tarjeta';
+        this.stripeError = e?.error?.detail ?? e?.message ?? 'Error al procesar el pago con tarjeta';
         this.procesandoPago = false;
         this.cdr.markForCheck();
       }

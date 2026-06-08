@@ -66,11 +66,21 @@ export class StripeService {
     return res.client_secret;
   }
 
-  async confirmCardPayment(clientSecret: string): Promise<void> {
+  async confirmCardPayment(clientSecret: string): Promise<string> {
     if (!this.stripe || !this.cardElement) throw new Error('Stripe no inicializado');
-    const { error } = await this.stripe.confirmCardPayment(clientSecret, {
+    const { error, paymentIntent } = await this.stripe.confirmCardPayment(clientSecret, {
       payment_method: { card: this.cardElement },
     });
     if (error) throw new Error(error.message ?? 'Error al procesar el pago');
+    return paymentIntent!.id;
+  }
+
+  async verificarPago(pagoId: number, paymentIntentId: string, tipo: string): Promise<void> {
+    await firstValueFrom(
+      this.http.post<{ success: boolean; message: string }>(
+        `${this.baseUrl}/api/stripe/verificar-pago`,
+        { pago_id: pagoId, payment_intent_id: paymentIntentId, tipo }
+      )
+    );
   }
 }
