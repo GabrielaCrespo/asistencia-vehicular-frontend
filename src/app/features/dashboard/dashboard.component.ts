@@ -60,6 +60,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     { label: 'Historial',   url: '/historial',   description: 'Registro completo de solicitudes, servicios y transacciones', color: '#7c3aed', bgColor: '#f5f3ff' },
     { label: 'Perfil',      url: '/perfil',      description: 'Actualiza la información y horario de tu taller',           color: '#db2777', bgColor: '#fdf2f8' },
     { label: 'Monitoreo',   url: '/monitoreo',   description: 'Seguimiento en tiempo real de tus técnicos',               color: '#0ea5e9', bgColor: '#f0f9ff' },
+    { label: 'Reportes',    url: '/reportes',    description: 'Genera reportes estáticos, dinámicos y por voz exportables', color: '#be185d', bgColor: '#fdf2f8' },
   ];
 
   ngOnInit(): void {
